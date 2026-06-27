@@ -941,6 +941,17 @@
       justify-content:space-between;
       gap:16px;
     }
+    .checkout-error{
+      display:none;
+      margin-top:16px;
+      border:1px solid #fed7aa;
+      border-radius:18px;
+      background:#fff7ed;
+      color:#9a3412;
+      padding:12px 14px;
+      font-weight:850;
+    }
+    .checkout-error.active{display:block}
     .summary-row.total{
       border-top:1px solid var(--line);
       padding-top:10px;
@@ -1550,6 +1561,7 @@
                 </div>
               </div>
 
+              <div class="checkout-error" id="orderSaveError">Order could not be saved. Please try again or contact us on WhatsApp.</div>
               <div class="checkout-actions">
                 <button class="btn secondary" onclick="goStep(3)">Back</button>
                 <button class="btn primary" onclick="createOrder()">Create Order</button>
@@ -1573,10 +1585,10 @@
   </div>
 
   <script>
-    const BASE_PRICE = 49;
-    const WHATSAPP_NUMBER = "447000000000"; // Real WhatsApp number format: country code + phone number, no plus sign.
+    let BASE_PRICE = 49;
+    let WHATSAPP_NUMBER = "447000000000"; // Real WhatsApp number format: country code + phone number, no plus sign.
 
-    const colours = [
+    let colours = [
       { name: "Blush Pink", value: "#f9a8d4" },
       { name: "Clean White", value: "#ffffff" },
       { name: "Sky Blue", value: "#a7d8ff" },
@@ -1621,6 +1633,69 @@
       "Turkey"
     ];
 
+    const defaultSiteConfig = {
+      hero: {
+        eyebrow: "8 colours · Wear or clip · Daily accessory",
+        title: "A little colour for every day.",
+        subtitle: "A clip-on watch accessory you can wear on your wrist, attach to your bag, or carry with your keys.",
+        imageUrl: ""
+      },
+      ways: [
+        { title: "Wrist", text: "Wear it as a casual daily watch.", imageUrl: "" },
+        { title: "Bag", text: "Clip it to your bag or backpack.", imageUrl: "" },
+        { title: "Keys", text: "Carry it as a small everyday accessory.", imageUrl: "" }
+      ],
+      colors: colours.map((colour) => ({ ...colour, imageUrl: "" })),
+      product: {
+        name: "Colour Clip Watch",
+        price: 49,
+        description: "Choose your colour and quantity, then continue to checkout when you are ready.",
+        defaultColor: "Sky Blue",
+        mainImageUrl: "",
+        colorImages: {}
+      },
+      benefits: [
+        { title: "Easy to match", text: "Works with casual outfits, bags and everyday carry." },
+        { title: "Small and lightweight", text: "Easy to wear, clip and carry without feeling bulky." },
+        { title: "Gift-friendly", text: "A simple colourful gift option that is easy to choose." }
+      ],
+      reviews: [
+        { name: "Mia", location: "London, United Kingdom", text: "Looks nice on my bag. The colour is cute but not too loud.", stars: 5 },
+        { name: "Lucas", location: "Berlin, Germany", text: "I like that I can wear it or clip it to my backpack. Simple and fun.", stars: 5 },
+        { name: "Emma", location: "Paris, France", text: "Delivery took around a week and the order was easy to confirm on WhatsApp.", stars: 5 }
+      ],
+      payment: {
+        paypal: "Fast checkout with a 5% handling fee.",
+        bankTransfer: "No extra handling fee.",
+        crypto: "No extra handling fee.",
+        paypalFeePercent: 5
+      },
+      delivery: [
+        { title: "Ships from Hong Kong", text: "Tracked delivery from Hong Kong." },
+        { title: "Estimated delivery", text: "Europe delivery usually takes 7–10 working days." },
+        { title: "Delivery route", text: "DHL or Royal Mail depending on destination." }
+      ],
+      faq: [
+        { question: "Can I wear it or clip it to a bag?", answer: "Yes. Wear it on your wrist, clip it to a bag or backpack, or carry it with your keys." },
+        { question: "How long does delivery take?", answer: "We ship from Hong Kong. Europe delivery usually takes 7–10 working days." },
+        { question: "What payment methods do you support?", answer: "PayPal, bank transfer and crypto payment are available. PayPal has a 5% handling fee." },
+        { question: "What happens after I place an order?", answer: "You will get an order number, then continue on WhatsApp to confirm your order." },
+        { question: "What if the item arrives damaged or wrong?", answer: "Send your order number and clear photos on WhatsApp. We will check and help resolve it." },
+        { question: "How do you use my checkout details?", answer: "Your details are only used to confirm your order and arrange delivery." }
+      ],
+      footer: {
+        brand: "Colour Clip Watch",
+        description: "A small daily accessory available in 8 colours.",
+        whatsapp: "For order help, continue on WhatsApp after creating your order number."
+      },
+      whatsapp: {
+        number: "447000000000",
+        message: "请确认一下我的订单："
+      }
+    };
+
+    let siteConfig = defaultSiteConfig;
+
     let selectedColour = "Sky Blue";
     let selectedColourValue = "#a7d8ff";
     let quantity = 1;
@@ -1661,6 +1736,132 @@
 
     function scrollToProduct(){
       document.getElementById("product").scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function setText(selector, value){
+      const element = document.querySelector(selector);
+      if(element && value) element.textContent = value;
+    }
+
+    function setImageBackground(element, imageUrl){
+      if(!element || !imageUrl) return;
+      element.style.backgroundImage = `linear-gradient(rgba(255,255,255,.14), rgba(255,255,255,.14)), url("${imageUrl}")`;
+      element.style.backgroundSize = "cover";
+      element.style.backgroundPosition = "center";
+    }
+
+    function mergeConfig(config){
+      return {
+        ...defaultSiteConfig,
+        ...config,
+        hero: { ...defaultSiteConfig.hero, ...(config.hero || {}) },
+        product: { ...defaultSiteConfig.product, ...(config.product || {}) },
+        payment: { ...defaultSiteConfig.payment, ...(config.payment || {}) },
+        footer: { ...defaultSiteConfig.footer, ...(config.footer || {}) },
+        whatsapp: { ...defaultSiteConfig.whatsapp, ...(config.whatsapp || {}) },
+        ways: config.ways || defaultSiteConfig.ways,
+        colors: config.colors || defaultSiteConfig.colors,
+        benefits: config.benefits || defaultSiteConfig.benefits,
+        reviews: config.reviews || defaultSiteConfig.reviews,
+        delivery: config.delivery || defaultSiteConfig.delivery,
+        faq: config.faq || defaultSiteConfig.faq
+      };
+    }
+
+    function renderSiteContent(config){
+      siteConfig = mergeConfig(config || {});
+      BASE_PRICE = Number(siteConfig.product.price || 49);
+      WHATSAPP_NUMBER = siteConfig.whatsapp.number || WHATSAPP_NUMBER;
+      colours = siteConfig.colors.map((colour) => ({
+        name: colour.name,
+        value: colour.value,
+        imageUrl: colour.imageUrl || ""
+      }));
+      const defaultColour = colours.find((colour) => colour.name === siteConfig.product.defaultColor) || colours[2] || colours[0];
+
+      selectedColour = defaultColour.name;
+      selectedColourValue = defaultColour.value;
+      productWatch.style.setProperty("--product-c", selectedColourValue);
+      productLabel.textContent = "Selected colour: " + selectedColour;
+
+      setText(".eyebrow", siteConfig.hero.eyebrow);
+      const heroTitle = document.querySelector(".hero h1");
+      if(heroTitle && siteConfig.hero.title) heroTitle.textContent = siteConfig.hero.title;
+      setText(".hero p", siteConfig.hero.subtitle);
+      setImageBackground(document.querySelector(".visual"), siteConfig.hero.imageUrl);
+
+      document.querySelectorAll(".use-card").forEach((card, index) => {
+        const way = siteConfig.ways[index];
+        if(!way) return;
+        card.querySelector("h3").textContent = way.title;
+        card.querySelector("p").textContent = way.text;
+        setImageBackground(card.querySelector(".use-image"), way.imageUrl);
+      });
+
+      const colorGrid = document.querySelector(".color-grid");
+      colorGrid.innerHTML = siteConfig.colors.map((colour) => `
+        <div class="color-card"><div class="color-dot" style="--c:${colour.value}"></div><b>${colour.name}</b></div>
+      `).join("");
+
+      setText(".product-info h2", siteConfig.product.name);
+      setText(".price", money(BASE_PRICE));
+      setText(".product-desc", siteConfig.product.description);
+      document.getElementById("subtotalText").textContent = "Subtotal: " + money(BASE_PRICE * quantity);
+      setImageBackground(document.querySelector(".product-media"), siteConfig.product.mainImageUrl);
+
+      document.querySelectorAll(".reason-card").forEach((card, index) => {
+        const benefit = siteConfig.benefits[index];
+        if(!benefit) return;
+        card.querySelector("h3").textContent = benefit.title;
+        card.querySelector("p").textContent = benefit.text;
+      });
+
+      document.querySelector(".review-grid").innerHTML = siteConfig.reviews.map((review) => `
+        <article class="review-card">
+          <div class="stars">${"★".repeat(Number(review.stars || 5))}</div>
+          <p>“${review.text}”</p>
+          <b>— ${review.name} · ${review.location}</b>
+        </article>
+      `).join("");
+
+      document.querySelectorAll(".pay-tag span").forEach((span, index) => {
+        const copy = [siteConfig.payment.paypal, siteConfig.payment.bankTransfer, siteConfig.payment.crypto][index];
+        if(copy) span.textContent = copy;
+      });
+
+      selectedFeeRate = Number(siteConfig.payment.paypalFeePercent || 5) / 100;
+      document.querySelector('.payment-option[data-method="PayPal"]').dataset.fee = String(selectedFeeRate);
+
+      document.querySelectorAll(".delivery-card").forEach((card, index) => {
+        const item = siteConfig.delivery[index];
+        if(!item) return;
+        card.querySelector("b").textContent = item.title;
+        card.querySelector("p").textContent = item.text;
+      });
+
+      document.querySelector(".faq-grid").innerHTML = siteConfig.faq.map((item) => `
+        <article class="faq-item">
+          <h3>${item.question}</h3>
+          <p>${item.answer}</p>
+        </article>
+      `).join("");
+
+      document.querySelector(".footer").innerHTML = `
+        <strong>${siteConfig.footer.brand}</strong><br>
+        ${siteConfig.footer.description}<br>
+        ${siteConfig.footer.whatsapp}
+      `;
+    }
+
+    async function loadSiteConfig(){
+      try {
+        const response = await fetch("/api/site-config");
+        if(!response.ok) return;
+        const data = await response.json();
+        if(data.config) renderSiteContent(data.config);
+      } catch (error) {
+        renderSiteContent(defaultSiteConfig);
+      }
     }
 
     function renderColourChoices(){
@@ -1748,7 +1949,7 @@
 
       const details = document.createElement("div");
       const title = document.createElement(compact ? "b" : "h3");
-      title.textContent = "Colour Clip Watch";
+      title.textContent = siteConfig.product.name || "Colour Clip Watch";
       const meta = document.createElement("p");
       meta.textContent = item.colour + " × " + item.quantity + " · Unit price " + money(BASE_PRICE);
       details.append(title, meta);
@@ -1944,16 +2145,61 @@
       goStep(4);
     }
 
-    function createOrder(){
+    async function createOrder(){
+      const errorBox = document.getElementById("orderSaveError");
+      errorBox.classList.remove("active");
       const now = new Date();
       const yyyy = now.getFullYear();
       const mm = String(now.getMonth() + 1).padStart(2, "0");
       const dd = String(now.getDate()).padStart(2, "0");
       const random = Math.floor(1000 + Math.random() * 9000);
       const orderNumber = "LMW-" + yyyy + mm + dd + "-" + random;
+      const order = {
+        orderNumber,
+        createdAt: now.toISOString(),
+        status: "New",
+        items: cart.map((item) => ({
+          productName: siteConfig.product.name || "Colour Clip Watch",
+          colour: item.colour,
+          quantity: item.quantity,
+          unitPrice: BASE_PRICE,
+          lineTotal: item.quantity * BASE_PRICE
+        })),
+        customer: {
+          fullName: document.getElementById("fullName").value.trim(),
+          email: document.getElementById("email").value.trim(),
+          phone: document.getElementById("phone").value.trim()
+        },
+        shipping: {
+          address1: document.getElementById("address1").value.trim(),
+          city: document.getElementById("city").value.trim(),
+          state: document.getElementById("state").value.trim(),
+          postcode: document.getElementById("postcode").value.trim(),
+          country: selectedCountry
+        },
+        paymentMethod: selectedPaymentMethod,
+        subtotal: subtotal(),
+        paymentFee: paymentFee(),
+        total: total()
+      };
+
+      try {
+        const response = await fetch("/api/orders", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ order })
+        });
+
+        if(!response.ok){
+          throw new Error("Order save failed");
+        }
+      } catch (error) {
+        errorBox.classList.add("active");
+        return;
+      }
 
       document.getElementById("orderNumber").textContent = orderNumber;
-      const message = "请确认一下我的订单：" + orderNumber;
+      const message = (siteConfig.whatsapp.message || "请确认一下我的订单：") + orderNumber;
       const url = "https://wa.me/" + WHATSAPP_NUMBER + "?text=" + encodeURIComponent(message);
       document.getElementById("whatsappLink").href = url;
       goStep(5);
@@ -2002,9 +2248,12 @@
       }
     });
 
-    renderColourChoices();
-    renderCountryOptions("");
-    updateSummary();
+    renderSiteContent(defaultSiteConfig);
+    loadSiteConfig().finally(() => {
+      renderColourChoices();
+      renderCountryOptions("");
+      updateSummary();
+    });
   </script>
 </body>
 </html>

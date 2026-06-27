@@ -5,5 +5,8 @@
   "type": "module",
   "scripts": {
     "start": "node server.mjs"
+  },
+  "dependencies": {
+    "@vercel/blob": "^1.0.2"
   }
 }

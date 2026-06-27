@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Colour Clip Watch Admin</title>
+  <style>
+    :root{--bg:#f7f1eb;--card:#fff;--line:#eadfd6;--text:#252127;--muted:#71676b;--deep:#302b3e;--accent:#d86f8f;--blue:#7899c8;--green:#16a34a}
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+    button,input,textarea,select{font:inherit}
+    button{cursor:pointer}
+    .login{min-height:100vh;display:grid;place-items:center;padding:24px}
+    .login-card,.panel,.sidebar{background:var(--card);border:1px solid var(--line);border-radius:22px;box-shadow:0 16px 44px rgba(64,48,56,.08)}
+    .login-card{width:min(420px,100%);padding:24px}
+    h1,h2,h3{margin-top:0;color:var(--deep)}
+    .field{display:grid;gap:7px;margin-bottom:12px}
+    label{font-weight:850;color:#463c44}
+    input,textarea,select{width:100%;border:1px solid var(--line);border-radius:14px;padding:12px;background:#fff;color:var(--text)}
+    textarea{min-height:86px;resize:vertical}
+    .btn{border:0;border-radius:999px;padding:12px 18px;font-weight:950;background:var(--deep);color:#fff}
+    .btn.secondary{background:#fff;color:var(--deep);border:1px solid var(--line)}
+    .btn.small{padding:8px 12px;font-size:13px}
+    .app{display:none;min-height:100vh;grid-template-columns:250px 1fr;gap:18px;padding:18px}
+    .sidebar{padding:16px;position:sticky;top:18px;height:calc(100vh - 36px)}
+    .brand{font-size:20px;font-weight:950;margin-bottom:18px}
+    .nav-btn{width:100%;border:0;background:transparent;text-align:left;border-radius:14px;padding:12px;color:var(--muted);font-weight:900}
+    .nav-btn.active{background:#f7f1eb;color:var(--deep)}
+    .main{display:grid;gap:18px}
+    .panel{padding:20px}
+    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+    .grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+    .item-card{border:1px solid var(--line);border-radius:18px;padding:14px;background:#fffdf9}
+    .muted{color:var(--muted)}
+    .status{margin-top:12px;color:var(--muted);font-weight:800}
+    .hidden{display:none}
+    .orders-layout{display:grid;grid-template-columns:minmax(300px,.9fr) minmax(420px,1.1fr);gap:16px}
+    table{width:100%;border-collapse:collapse;background:#fff}
+    th,td{border-bottom:1px solid var(--line);padding:10px;text-align:left;font-size:13px;vertical-align:top}
+    th{color:var(--muted)}
+    .detail-section{border:1px solid var(--line);border-radius:18px;padding:14px;margin-bottom:12px;background:#fffdf9}
+    .detail-section p{margin:6px 0}
+    .error{color:#b45309;font-weight:900}
+    @media(max-width:850px){.app{grid-template-columns:1fr}.sidebar{position:static;height:auto}.grid,.grid-3,.orders-layout{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <section class="login" id="loginView">
+    <div class="login-card">
+      <h1>Admin Login</h1>
+      <p class="muted">Enter the admin password configured in Vercel.</p>
+      <div class="field">
+        <label for="adminPassword">Password</label>
+        <input id="adminPassword" type="password" autocomplete="current-password" />
+      </div>
+      <button class="btn" id="loginButton">Login</button>
+      <div class="status error" id="loginStatus"></div>
+    </div>
+  </section>
+
+  <section class="app" id="appView">
+    <aside class="sidebar">
+      <div class="brand">Colour Clip Admin</div>
+      <button class="nav-btn active" data-view="dashboard">Dashboard</button>
+      <button class="nav-btn" data-view="frontPage">Front Page</button>
+      <button class="nav-btn" data-view="product">Product</button>
+      <button class="nav-btn" data-view="images">Images</button>
+      <button class="nav-btn" data-view="orders">Orders</button>
+      <button class="nav-btn" data-view="settings">Settings</button>
+    </aside>
+
+    <main class="main">
+      <section class="panel view" id="dashboard">
+        <h1>Dashboard</h1>
+        <p class="muted">Manage page content, product information, images and orders.</p>
+        <div class="grid-3">
+          <div class="item-card"><h3>Front Page</h3><p>Edit copy, sections and FAQs.</p></div>
+          <div class="item-card"><h3>Images</h3><p>Paste image URLs or upload image files.</p></div>
+          <div class="item-card"><h3>Orders</h3><p>Review customer orders and update status.</p></div>
+        </div>
+      </section>
+
+      <section class="panel view hidden" id="frontPage">
+        <h1>Front Page</h1>
+        <div class="grid">
+          <div class="field"><label>Hero eyebrow</label><input data-path="hero.eyebrow" /></div>
+          <div class="field"><label>Hero image URL</label><input data-path="hero.imageUrl" /></div>
+          <div class="field"><label>Hero title</label><input data-path="hero.title" /></div>
+          <div class="field"><label>Hero subtitle</label><textarea data-path="hero.subtitle"></textarea></div>
+        </div>
+        <h2>Ways to wear</h2>
+        <div class="grid-3" id="waysEditor"></div>
+        <h2>Colours</h2>
+        <div class="grid" id="colorsEditor"></div>
+        <h2>Benefits</h2>
+        <div class="grid-3" id="benefitsEditor"></div>
+        <h2>Reviews</h2>
+        <div class="grid-3" id="reviewsEditor"></div>
+        <h2>Payment</h2>
+        <div class="grid">
+          <div class="field"><label>PayPal copy</label><input data-path="payment.paypal" /></div>
+          <div class="field"><label>Bank Transfer copy</label><input data-path="payment.bankTransfer" /></div>
+          <div class="field"><label>Crypto Payment copy</label><input data-path="payment.crypto" /></div>
+          <div class="field"><label>PayPal fee percent</label><input data-path="payment.paypalFeePercent" type="number" /></div>
+        </div>
+        <h2>Delivery</h2>
+        <div class="grid-3" id="deliveryEditor"></div>
+        <h2>FAQ</h2>
+        <div class="grid" id="faqEditor"></div>
+        <h2>Footer</h2>
+        <div class="grid">
+          <div class="field"><label>Brand</label><input data-path="footer.brand" /></div>
+          <div class="field"><label>Description</label><input data-path="footer.description" /></div>
+          <div class="field"><label>WhatsApp footer copy</label><input data-path="footer.whatsapp" /></div>
+        </div>
+        <button class="btn" onclick="saveConfig()">Save Front Page</button>
+        <div class="status" id="configStatus"></div>
+      </section>
+
+      <section class="panel view hidden" id="product">
+        <h1>Product</h1>
+        <div class="grid">
+          <div class="field"><label>Product name</label><input data-path="product.name" /></div>
+          <div class="field"><label>Product price</label><input data-path="product.price" type="number" /></div>
+          <div class="field"><label>Default colour</label><input data-path="product.defaultColor" /></div>
+          <div class="field"><label>Main image URL</label><input data-path="product.mainImageUrl" /></div>
+          <div class="field"><label>Product description</label><textarea data-path="product.description"></textarea></div>
+        </div>
+        <button class="btn" onclick="saveConfig()">Save Product</button>
+      </section>
+
+      <section class="panel view hidden" id="images">
+        <h1>Images</h1>
+        <p class="muted">Paste image URLs into image fields, or upload a jpg, png or webp image up to 3MB.</p>
+        <div class="grid">
+          <div class="field">
+            <label>Target image field</label>
+            <select id="imageTarget"></select>
+          </div>
+          <div class="field">
+            <label>Upload image</label>
+            <input id="imageFile" type="file" accept="image/jpeg,image/png,image/webp" />
+          </div>
+        </div>
+        <button class="btn" onclick="uploadImage()">Upload and fill selected field</button>
+        <div class="status" id="uploadStatus"></div>
+      </section>
+
+      <section class="panel view hidden" id="orders">
+        <h1>Orders</h1>
+        <button class="btn secondary" onclick="loadOrders()">Refresh orders</button>
+        <div class="orders-layout">
+          <div class="item-card">
+            <table>
+              <thead><tr><th>Order</th><th>Name</th><th>Country</th><th>Total</th><th>Status</th><th></th></tr></thead>
+              <tbody id="ordersTable"></tbody>
+            </table>
+          </div>
+          <div id="orderDetail" class="item-card">
+            <p class="muted">Select an order to view details.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel view hidden" id="settings">
+        <h1>Settings</h1>
+        <div class="grid">
+          <div class="field"><label>WhatsApp number</label><input data-path="whatsapp.number" /></div>
+          <div class="field"><label>WhatsApp message prefix</label><input data-path="whatsapp.message" /></div>
+        </div>
+        <button class="btn" onclick="saveConfig()">Save Settings</button>
+        <p class="muted">Configure the admin password, KV or Upstash storage credentials, and optional Blob upload credentials in Vercel.</p>
+      </section>
+    </main>
+  </section>
+
+  <script>
+    const ORDER_STATUSES = ["New","Confirmed","Pending Payment","Paid","Processing","Shipped","Completed","Cancelled"];
+    const defaultConfig = {
+      hero:{eyebrow:"8 colours · Wear or clip · Daily accessory",title:"A little colour for every day.",subtitle:"A clip-on watch accessory you can wear on your wrist, attach to your bag, or carry with your keys.",imageUrl:""},
+      ways:[{title:"Wrist",text:"Wear it as a casual daily watch.",imageUrl:""},{title:"Bag",text:"Clip it to your bag or backpack.",imageUrl:""},{title:"Keys",text:"Carry it as a small everyday accessory.",imageUrl:""}],
+      colors:[["Blush Pink","#f9a8d4"],["Clean White","#ffffff"],["Sky Blue","#a7d8ff"],["Sage Green","#a7f3d0"],["Classic Black","#111111"],["Soft Orange","#ffae71"],["Warm Yellow","#ffe66d"],["Soft Purple","#cdb8ff"]].map(([name,value])=>({name,value,imageUrl:""})),
+      product:{name:"Colour Clip Watch",price:49,description:"Choose your colour and quantity, then continue to checkout when you are ready.",defaultColor:"Sky Blue",mainImageUrl:"",colorImages:{}},
+      benefits:[{title:"Easy to match",text:"Works with casual outfits, bags and everyday carry."},{title:"Small and lightweight",text:"Easy to wear, clip and carry without feeling bulky."},{title:"Gift-friendly",text:"A simple colourful gift option that is easy to choose."}],
+      reviews:[{name:"Mia",location:"London, United Kingdom",text:"Looks nice on my bag. The colour is cute but not too loud.",stars:5},{name:"Lucas",location:"Berlin, Germany",text:"I like that I can wear it or clip it to my backpack. Simple and fun.",stars:5},{name:"Emma",location:"Paris, France",text:"Delivery took around a week and the order was easy to confirm on WhatsApp.",stars:5}],
+      payment:{paypal:"Fast checkout with a 5% handling fee.",bankTransfer:"No extra handling fee.",crypto:"No extra handling fee.",paypalFeePercent:5},
+      delivery:[{title:"Ships from Hong Kong",text:"Tracked delivery from Hong Kong."},{title:"Estimated delivery",text:"Europe delivery usually takes 7–10 working days."},{title:"Delivery route",text:"DHL or Royal Mail depending on destination."}],
+      faq:[{question:"Can I wear it or clip it to a bag?",answer:"Yes. Wear it on your wrist, clip it to a bag or backpack, or carry it with your keys."},{question:"How long does delivery take?",answer:"We ship from Hong Kong. Europe delivery usually takes 7–10 working days."},{question:"What payment methods do you support?",answer:"PayPal, bank transfer and crypto payment are available. PayPal has a 5% handling fee."},{question:"What happens after I place an order?",answer:"You will get an order number, then continue on WhatsApp to confirm your order."},{question:"What if the item arrives damaged or wrong?",answer:"Send your order number and clear photos on WhatsApp. We will check and help resolve it."},{question:"How do you use my checkout details?",answer:"Your details are only used to confirm your order and arrange delivery."}],
+      footer:{brand:"Colour Clip Watch",description:"A small daily accessory available in 8 colours.",whatsapp:"For order help, continue on WhatsApp after creating your order number."},
+      whatsapp:{number:"447000000000",message:"请确认一下我的订单："}
+    };
+    let adminPassword = sessionStorage.getItem("ccwAdminPassword") || "";
+    let config = structuredClone(defaultConfig);
+    let orders = [];
+
+    function getPath(path){return path.split(".").reduce((value,key)=>value?.[key],config)}
+    function setPath(path,value){const keys=path.split(".");let target=config;keys.slice(0,-1).forEach((key)=>target=target[key]);target[keys.at(-1)] = value}
+    function authHeaders(){return {"Content-Type":"application/json","x-admin-password":adminPassword}}
+    function mergeConfig(remote){return {...defaultConfig,...remote,hero:{...defaultConfig.hero,...remote?.hero},product:{...defaultConfig.product,...remote?.product},payment:{...defaultConfig.payment,...remote?.payment},footer:{...defaultConfig.footer,...remote?.footer},whatsapp:{...defaultConfig.whatsapp,...remote?.whatsapp},ways:remote?.ways||defaultConfig.ways,colors:remote?.colors||defaultConfig.colors,benefits:remote?.benefits||defaultConfig.benefits,reviews:remote?.reviews||defaultConfig.reviews,delivery:remote?.delivery||defaultConfig.delivery,faq:remote?.faq||defaultConfig.faq}}
+
+    document.getElementById("loginButton").addEventListener("click", login);
+    document.querySelectorAll(".nav-btn").forEach((button)=>button.addEventListener("click",()=>showView(button.dataset.view)));
+    document.querySelectorAll("[data-path]").forEach((input)=>input.addEventListener("input",()=>setPath(input.dataset.path,input.type==="number"?Number(input.value):input.value)));
+
+    async function login(){
+      adminPassword = document.getElementById("adminPassword").value;
+      const status = document.getElementById("loginStatus");
+      status.textContent = "";
+      try{
+        const response = await fetch("/api/admin/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({password:adminPassword})});
+        const data = await response.json();
+        if(!response.ok) throw new Error(data.error || "Login failed");
+        sessionStorage.setItem("ccwAdminPassword",adminPassword);
+        document.getElementById("loginView").style.display = "none";
+        document.getElementById("appView").style.display = "grid";
+        await loadConfig();
+        await loadOrders();
+      }catch(error){status.textContent = error.message}
+    }
+
+    function showView(id){
+      document.querySelectorAll(".view").forEach((view)=>view.classList.add("hidden"));
+      document.getElementById(id).classList.remove("hidden");
+      document.querySelectorAll(".nav-btn").forEach((button)=>button.classList.toggle("active",button.dataset.view===id));
+    }
+
+    function renderArrayEditors(){
+      renderCards("waysEditor","ways",["title","text","imageUrl"]);
+      renderCards("colorsEditor","colors",["name","value","imageUrl"]);
+      renderCards("benefitsEditor","benefits",["title","text"]);
+      renderCards("reviewsEditor","reviews",["name","location","text","stars"]);
+      renderCards("deliveryEditor","delivery",["title","text"]);
+      renderCards("faqEditor","faq",["question","answer"]);
+      renderImageTargets();
+    }
+
+    function renderCards(containerId,path,fields){
+      const container=document.getElementById(containerId);
+      container.innerHTML="";
+      getPath(path).forEach((item,index)=>{
+        const card=document.createElement("div");
+        card.className="item-card";
+        card.innerHTML=fields.map((field)=>`<div class="field"><label>${field}</label><input data-array="${path}" data-index="${index}" data-field="${field}" value="${item[field] ?? ""}"></div>`).join("");
+        container.appendChild(card);
+      });
+      container.querySelectorAll("input").forEach((input)=>input.addEventListener("input",()=>{config[input.dataset.array][input.dataset.index][input.dataset.field]=input.type==="number"?Number(input.value):input.value}));
+    }
+
+    function renderImageTargets(){
+      const targets=["hero.imageUrl","product.mainImageUrl",...config.ways.map((_,i)=>`ways.${i}.imageUrl`),...config.colors.map((_,i)=>`colors.${i}.imageUrl`)];
+      document.getElementById("imageTarget").innerHTML=targets.map((target)=>`<option value="${target}">${target}</option>`).join("");
+    }
+
+    function fillInputs(){
+      document.querySelectorAll("[data-path]").forEach((input)=>input.value=getPath(input.dataset.path) ?? "");
+      renderArrayEditors();
+    }
+
+    async function loadConfig(){
+      try{
+        const response=await fetch("/api/site-config");
+        const data=await response.json();
+        if(!response.ok) throw new Error(data.error || "Storage is not configured.");
+        config=mergeConfig(data.config || {});
+      }catch(error){
+        document.getElementById("configStatus").textContent=error.message;
+      }
+      fillInputs();
+    }
+
+    async function saveConfig(){
+      const status=document.getElementById("configStatus");
+      status.textContent="Saving...";
+      try{
+        const response=await fetch("/api/site-config",{method:"POST",headers:authHeaders(),body:JSON.stringify({config})});
+        const data=await response.json();
+        if(!response.ok) throw new Error(data.error || "Save failed");
+        status.textContent="Saved.";
+      }catch(error){status.textContent=error.message}
+    }
+
+    async function uploadImage(){
+      const file=document.getElementById("imageFile").files[0];
+      const target=document.getElementById("imageTarget").value;
+      const status=document.getElementById("uploadStatus");
+      if(!file){status.textContent="Choose an image first.";return}
+      const form=new FormData();
+      form.append("password",adminPassword);
+      form.append("image",file);
+      status.textContent="Uploading...";
+      try{
+        const response=await fetch("/api/admin/upload-image",{method:"POST",headers:{"x-admin-password":adminPassword},body:form});
+        const data=await response.json();
+        if(!response.ok) throw new Error(data.error || "Upload failed");
+        setPath(target,data.url);
+        fillInputs();
+        status.textContent="Uploaded and filled: "+data.url;
+      }catch(error){status.textContent=error.message}
+    }
+
+    async function loadOrders(){
+      try{
+        const response=await fetch("/api/orders",{headers:{"x-admin-password":adminPassword}});
+        const data=await response.json();
+        if(!response.ok) throw new Error(data.error || "Orders failed");
+        orders=data.orders || [];
+        renderOrders();
+      }catch(error){document.getElementById("ordersTable").innerHTML=`<tr><td colspan="6" class="error">${error.message}</td></tr>`}
+    }
+
+    function renderOrders(){
+      document.getElementById("ordersTable").innerHTML=orders.map((order,index)=>`
+        <tr>
+          <td><button class="btn small secondary" onclick="showOrder(${index})">${order.orderNumber}</button></td>
+          <td>${order.customer?.fullName || ""}</td>
+          <td>${order.shipping?.country || ""}</td>
+          <td>${order.quantity || 0}</td>
+          <td>€${Number(order.total || 0).toFixed(2)}<br>${order.paymentMethod || ""}</td>
+          <td>${order.status || "New"}<br><button class="btn small" onclick="showOrder(${index})">View</button></td>
+        </tr>
+      `).join("");
+    }
+
+    function showOrder(index){
+      const order=orders[index];
+      const items=(order.items || []).map((item)=>`<p><b>${item.productName}</b><br>Colour: ${item.colour}<br>Quantity: ${item.quantity}<br>Unit Price: €${Number(item.unitPrice||0).toFixed(2)}<br>Line Total: €${Number(item.lineTotal||0).toFixed(2)}</p>`).join("");
+      document.getElementById("orderDetail").innerHTML=`
+        <div class="detail-section"><h3>Order Summary</h3><p><b>Order Number:</b> ${order.orderNumber}</p><p><b>Order Date:</b> ${new Date(order.createdAt).toLocaleString()}</p><p><b>Status:</b> ${order.status}</p><p><b>Payment Method:</b> ${order.paymentMethod}</p><p><b>Subtotal:</b> €${Number(order.subtotal||0).toFixed(2)}</p><p><b>Payment Fee:</b> €${Number(order.paymentFee||0).toFixed(2)}</p><p><b>Order Total:</b> €${Number(order.total||0).toFixed(2)}</p><select onchange="updateStatus('${order.orderNumber}', this.value)">${ORDER_STATUSES.map((status)=>`<option ${status===order.status?"selected":""}>${status}</option>`).join("")}</select></div>
+        <div class="detail-section"><h3>Customer Details</h3><p><b>Full Name:</b> ${order.customer?.fullName || ""}</p><p><b>Email:</b> ${order.customer?.email || ""}</p><p><b>Phone Number:</b> ${order.customer?.phone || ""}</p></div>
+        <div class="detail-section"><h3>Shipping Details</h3><p><b>Address Line 1:</b> ${order.shipping?.address1 || ""}</p><p><b>City:</b> ${order.shipping?.city || ""}</p><p><b>State / Province / Region:</b> ${order.shipping?.state || ""}</p><p><b>Postcode / ZIP Code:</b> ${order.shipping?.postcode || ""}</p><p><b>Country:</b> ${order.shipping?.country || ""}</p></div>
+        <div class="detail-section"><h3>Items</h3>${items}</div>
+        <button class="btn" onclick="copyCustomerSummary(${index})">Copy Customer Summary</button>
+      `;
+    }
+
+    async function updateStatus(orderNumber,status){
+      const response=await fetch("/api/orders",{method:"PATCH",headers:authHeaders(),body:JSON.stringify({orderNumber,status})});
+      if(response.ok) await loadOrders();
+    }
+
+    function copyCustomerSummary(index){
+      const order=orders[index];
+      const first=order.items?.[0] || {};
+      const text=`Order Number: ${order.orderNumber}\nProduct: ${first.productName || ""}\nColour: ${first.colour || ""}\nQuantity: ${first.quantity || ""}\nOrder Total: €${Number(order.total||0).toFixed(2)}\nPayment Method: ${order.paymentMethod || ""}\n\nCustomer:\nName: ${order.customer?.fullName || ""}\nPhone: ${order.customer?.phone || ""}\nEmail: ${order.customer?.email || ""}\n\nShipping Address:\n${order.shipping?.address1 || ""}\n${order.shipping?.city || ""}\n${order.shipping?.state || ""}\n${order.shipping?.postcode || ""}\n${order.shipping?.country || ""}`;
+      navigator.clipboard.writeText(text);
+    }
+  </script>
+</body>
+</html>
