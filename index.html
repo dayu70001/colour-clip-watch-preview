@@ -4,6 +4,19 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Colour Clip Watch</title>
+  <script>
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '1235733945169519');
+    fbq('track', 'PageView');
+  </script>
+  <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1235733945169519&ev=PageView&noscript=1" /></noscript>
   <style>
     :root{
       --bg:#fff9f2;
@@ -2008,6 +2021,9 @@
     let addressRequestId = 0;
     const SUCCESS_ORDER_KEY = "colourClipLastSuccessOrder";
     const SUCCESS_ORDER_AT_KEY = "colourClipLastSuccessAt";
+    const PIXEL_PRODUCT_NAME = "Colour Clip Watch";
+    let viewContentTracked = false;
+    const leadTrackedOrders = new Set();
 
     function money(value){
       return "€" + value.toFixed(2);
@@ -2023,6 +2039,43 @@
 
     function total(){
       return subtotal() + paymentFee();
+    }
+
+    function trackPixel(eventName, params){
+      if(typeof fbq === "function"){
+        fbq("track", eventName, params);
+      }
+    }
+
+    function trackPixelCustom(eventName, params){
+      if(typeof fbq === "function"){
+        fbq("trackCustom", eventName, params);
+      }
+    }
+
+    function getCartValue(){
+      return subtotal();
+    }
+
+    function productPixelParams(value){
+      return {
+        content_name: PIXEL_PRODUCT_NAME,
+        content_type: "product",
+        value,
+        currency: "EUR"
+      };
+    }
+
+    function trackViewContentOnce(){
+      if(viewContentTracked) return;
+      viewContentTracked = true;
+      trackPixel("ViewContent", productPixelParams(BASE_PRICE));
+    }
+
+    function trackLeadOnce(orderNumber, value){
+      if(leadTrackedOrders.has(orderNumber)) return;
+      leadTrackedOrders.add(orderNumber);
+      trackPixel("Lead", productPixelParams(value));
     }
 
     function successWhatsappUrl(orderNumber){
@@ -2303,6 +2356,7 @@
 
     function addToCartSelected(){
       addSelectedToCart();
+      trackPixel("AddToCart", productPixelParams(BASE_PRICE));
       openCheckout();
     }
 
@@ -2318,6 +2372,7 @@
       checkoutBackdrop.scrollTop = 0;
       renderCart();
       updateSummary();
+      trackPixel("InitiateCheckout", productPixelParams(getCartValue()));
       goStep(1);
     }
 
@@ -2694,6 +2749,7 @@
       }
 
       saveSuccessOrder(orderNumber);
+      trackLeadOnce(orderNumber, total());
       showSuccessOrder(orderNumber);
     }
 
@@ -2707,6 +2763,12 @@
       if(!checkoutBackdrop.classList.contains("active")){
         resetPageAfterCheckout();
       }
+    });
+
+    document.getElementById("whatsappLink").addEventListener("click", () => {
+      trackPixelCustom("taplink:messengers:whatsapp", {
+        content_name: PIXEL_PRODUCT_NAME
+      });
     });
 
     countrySearch.addEventListener("focus", () => {
@@ -2861,6 +2923,7 @@
       renderColourChoices();
       renderCountryOptions("");
       updateSummary();
+      trackViewContentOnce();
       restoreSuccessAfterRefresh();
       if(window.__ccwAdminEdit) window.__ccwAdminEdit.ready();
     });
