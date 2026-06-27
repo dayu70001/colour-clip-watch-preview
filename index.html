@@ -65,8 +65,8 @@
     .container{width:100%;max-width:1120px;margin:0 auto}
 
     .nav{
-      position:sticky;
-      top:0;
+      position:relative;
+      top:auto;
       z-index:80;
       background:rgba(255,249,242,.86);
       border-bottom:1px solid rgba(234,223,214,.78);
@@ -627,8 +627,10 @@
     .fixed-order{
       position:fixed;
       z-index:110;
-      left:16px;right:16px;bottom:16px;
-      max-width:640px;
+      left:16px;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));
+      width:auto;
+      max-width:min(640px, calc(100vw - 32px));
+      box-sizing:border-box;
       min-height:72px;
       margin:0 auto;
       padding:12px 12px 12px 22px;
@@ -651,15 +653,18 @@
       display:block;
       font-size:17px;
       line-height:1.1;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
     }
     .fixed-copy span{
-      display:block;
-      margin-top:3px;
-      color:rgba(255,255,255,.86);
-      font-size:14px;
-      line-height:1.2;
+      display:none !important;
     }
-    .fixed-order button{
+    .fixed-copy{
+      min-width:0;
+    }
+    .fixed-order button,
+    .fixed-cta{
       border:0;background:#fff;color:var(--deep);
       border-radius:999px;
       padding:16px 26px;
@@ -1173,7 +1178,6 @@
         box-sizing:border-box;
       }
       .fixed-copy b{font-size:16px}
-      .fixed-copy span{font-size:13px}
       .fixed-order button{padding:14px 20px;font-size:15px}
 
       .checkout-backdrop{padding:0}
@@ -1222,7 +1226,6 @@
     }
 
     @media(max-width:380px){
-      .fixed-copy span{display:none}
       .fixed-order{min-height:66px}
       .fixed-order button{padding:13px 18px}
     }
@@ -1548,9 +1551,8 @@
   <div class="fixed-order" id="fixedOrder">
     <div class="fixed-copy">
       <b>Colour Clip Watch</b>
-      <span>8 colours · Wear or clip</span>
     </div>
-    <button onclick="scrollToProduct()">Order Now</button>
+    <button class="fixed-cta" onclick="scrollToProduct()">Order Now</button>
   </div>
 
   <div class="checkout-backdrop" id="checkoutBackdrop" role="dialog" aria-modal="true" aria-label="Checkout">
@@ -2036,6 +2038,8 @@
       addSelectedToCart();
       checkoutBackdrop.classList.add("active");
       fixedOrder.classList.add("hidden");
+      document.body.classList.add("checkout-open");
+      document.documentElement.classList.add("checkout-open");
       document.body.style.overflow = "hidden";
       renderCart();
       updateSummary();
@@ -2045,7 +2049,26 @@
     function closeCheckout(){
       checkoutBackdrop.classList.remove("active");
       fixedOrder.classList.remove("hidden");
+      resetPageAfterCheckout();
+    }
+
+    function resetPageAfterCheckout(){
+      document.body.classList.remove("checkout-open", "modal-open");
+      document.documentElement.classList.remove("checkout-open", "modal-open");
+
       document.body.style.overflow = "";
+      document.body.style.position = "";
+      document.body.style.width = "";
+      document.body.style.top = "";
+      document.body.style.left = "";
+      document.body.style.right = "";
+
+      document.documentElement.style.overflow = "";
+      document.documentElement.style.position = "";
+      document.documentElement.style.width = "";
+
+      document.documentElement.scrollLeft = 0;
+      document.body.scrollLeft = 0;
     }
 
     function scrollCheckoutToTop(){
@@ -2342,6 +2365,13 @@
         closeCheckout();
       }
     });
+
+    document.getElementById("whatsappLink").addEventListener("click", () => {
+      closeCheckout();
+      resetPageAfterCheckout();
+    });
+
+    window.addEventListener("pageshow", resetPageAfterCheckout);
 
     countrySearch.addEventListener("focus", () => {
       countrySelect.classList.add("open");
