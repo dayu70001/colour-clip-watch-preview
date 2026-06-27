@@ -365,6 +365,13 @@
       width:300px;height:300px;border-radius:50%;
       background:rgba(255,255,255,.45);
     }
+    /* When a real uploaded image is shown, hide all decorative graphics and
+       overlays so the image displays cleanly. */
+    .visual.has-bg-image::before,
+    .visual.has-bg-image .watch,
+    .visual.has-bg-image .visual-label{display:none}
+    .product-media.has-bg-image::before,
+    .product-media.has-bg-image .product-watch{display:none}
     .product-watch{
       position:relative;
       width:230px;height:230px;border-radius:50%;
@@ -1994,10 +2001,22 @@
     }
 
     function setImageBackground(element, imageUrl){
-      if(!element || !imageUrl) return;
-      element.style.backgroundImage = `linear-gradient(rgba(255,255,255,.14), rgba(255,255,255,.14)), url("${imageUrl}")`;
-      element.style.backgroundSize = "cover";
-      element.style.backgroundPosition = "center";
+      if(!element) return;
+      if(imageUrl){
+        // Show the uploaded image cleanly — no gradient/overlay on top.
+        element.style.backgroundImage = `url("${imageUrl}")`;
+        element.style.backgroundSize = "cover";
+        element.style.backgroundPosition = "center";
+        element.style.backgroundRepeat = "no-repeat";
+        element.classList.add("has-bg-image");
+      }else{
+        // No image configured: restore the default decorative look.
+        element.style.backgroundImage = "";
+        element.style.backgroundSize = "";
+        element.style.backgroundPosition = "";
+        element.style.backgroundRepeat = "";
+        element.classList.remove("has-bg-image");
+      }
     }
 
     function mergeConfig(config){
@@ -2148,6 +2167,11 @@
       selectedColour = name;
       selectedColourValue = value;
       productWatch.style.setProperty("--product-c", value);
+      // Switch the main product image to this colour's image when available,
+      // otherwise fall back to the product main image (or the default watch).
+      const colour = colours.find((item) => item.name === name);
+      const image = (colour && colour.imageUrl) || siteConfig.product.mainImageUrl || "";
+      setImageBackground(document.querySelector(".product-media"), image);
       updateColourStatus();
       document.querySelectorAll(".choice").forEach((el) => {
         el.classList.toggle("active", el.dataset.colour === name);
