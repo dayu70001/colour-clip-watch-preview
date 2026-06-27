@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Colour Clip Watch</title>
   <style>
     :root{
@@ -26,26 +26,18 @@
 
     *,*::before,*::after{box-sizing:border-box;min-width:0}
 
-    /* Hard viewport lock.
-       The document itself never scrolls or pans: html/body are pinned to the
-       viewport with overflow hidden, so the page cannot be dragged sideways
-       and there is no document-level scroll to make position:fixed jitter on
-       iOS. All vertical scrolling happens inside .page instead. This is what
-       keeps every phone (incl. iOS Safari) from drifting left/right or moving
-       the bottom bar while scrolling. */
     html,body{
       margin:0;
       padding:0;
       width:100%;
-      height:100%;
-      overflow:hidden;
-      overscroll-behavior:none;
+      max-width:100%;
+      min-height:100%;
+      overflow-x:hidden;
       -webkit-text-size-adjust:100%;
     }
     html{scroll-behavior:smooth}
     body{
-      position:fixed;
-      inset:0;
+      position:relative;
       font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
       color:var(--text);
       background:
@@ -53,6 +45,7 @@
         radial-gradient(circle at 93% 2%, rgba(218,231,255,.82), rgba(218,231,255,0) 34%),
         linear-gradient(180deg,var(--bg),#fff 54%,#fffaf5);
       line-height:1.5;
+      overflow-x:hidden;
     }
 
     button,input,textarea{font:inherit}
@@ -62,18 +55,14 @@
     img{display:block}
     h1,h2,h3,p,a,b,span,label,div{overflow-wrap:break-word}
 
-    /* The only vertical scroll container. */
     .page{
-      height:100%;
+      min-height:100vh;
       width:100%;
       max-width:100%;
-      overflow-y:auto;
-      overflow-x:hidden;
-      -webkit-overflow-scrolling:touch;
-      overscroll-behavior-y:contain;
+      overflow-x:clip;
       padding-bottom:calc(106px + env(safe-area-inset-bottom));
     }
-    .container{max-width:1120px;margin:0 auto}
+    .container{width:100%;max-width:1120px;margin:0 auto}
 
     .nav{
       position:sticky;
@@ -694,8 +683,8 @@
     }
     .checkout-backdrop.active{display:block}
     .checkout{
-      width:min(100% - 0px, 1080px);
-      max-width:1080px;
+      width:min(100% - 24px, 1080px);
+      max-width:calc(100vw - 24px);
       margin:28px auto;
       background:#fff;
       border-radius:34px;
@@ -1175,10 +1164,13 @@
       .product-actions .btn{width:100%}
 
       .fixed-order{
-        left:12px;right:12px;bottom:14px;
+        left:12px;right:12px;bottom:calc(14px + env(safe-area-inset-bottom));
+        width:auto;
         min-height:72px;
         padding:11px 11px 11px 18px;
-        max-width:none;
+        max-width:calc(100vw - 24px);
+        transform:none;
+        box-sizing:border-box;
       }
       .fixed-copy b{font-size:16px}
       .fixed-copy span{font-size:13px}
@@ -1186,9 +1178,11 @@
 
       .checkout-backdrop{padding:0}
       .checkout{
-        min-height:100vh;
-        margin:0;
-        border-radius:0;
+        width:min(100% - 24px, 1080px);
+        max-width:calc(100vw - 24px);
+        min-height:calc(100dvh - 24px);
+        margin:12px auto;
+        border-radius:24px;
       }
       .checkout-head{padding:16px}
       .steps{
@@ -1270,10 +1264,6 @@
       }
     }
 
-    /* Mobile width lock: keep every main container inside the viewport so the
-       page can never be dragged sideways. Uses max-width (not overflow-x) on
-       inner checkout containers to avoid clipping the country / address
-       dropdowns. Body-level overflow-x:clip is the real horizontal lock. */
     @media (max-width:768px){
       .page,
       .container,
@@ -1862,13 +1852,9 @@
 
     function scrollToProduct(){
       const product = document.getElementById("product");
-      const page = document.querySelector(".page") || document.scrollingElement;
-      if(!product || !page) return;
-      const start = page.scrollTop;
-      const y = product.getBoundingClientRect().top - page.getBoundingClientRect().top + start;
-      page.scrollTo({ top: y, behavior: "smooth" });
-      // Fallback for engines that ignore smooth scrolling on overflow containers.
-      setTimeout(() => { if(Math.abs(page.scrollTop - start) < 2) page.scrollTop = y; }, 320);
+      if(!product) return;
+      const y = product.getBoundingClientRect().top + window.scrollY - 12;
+      window.scrollTo({ top: y, behavior: "smooth" });
     }
 
     function setText(selector, value){
@@ -2063,17 +2049,9 @@
     }
 
     function scrollCheckoutToTop(){
-      // The checkout modal scrolls inside the backdrop, not the window
-      // (body scrolling is locked while checkout is open). Reset instantly
-      // first so the new step always starts at the top, then smooth-scroll
-      // as a nicety where supported.
-      const panel = checkoutBackdrop;
-      if(panel){
-        panel.scrollTop = 0;
-        try { panel.scrollTo({ top: 0, behavior: "smooth" }); } catch(error) {}
-      }
+      if(document.activeElement instanceof HTMLElement) document.activeElement.blur();
+      if(checkoutBackdrop) checkoutBackdrop.scrollTop = 0;
       if(checkoutPanel) checkoutPanel.scrollTop = 0;
-      try { window.scrollTo({ top: 0, behavior: "smooth" }); } catch(error) { window.scrollTo(0, 0); }
     }
 
     function goStep(step){
