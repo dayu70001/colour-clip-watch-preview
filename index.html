@@ -532,6 +532,12 @@
       text-decoration:none;
     }
     .btn:hover{transform:translateY(-1px)}
+    .btn:disabled{
+      opacity:.48;
+      cursor:not-allowed;
+      transform:none;
+      box-shadow:none;
+    }
     .btn.primary{
       color:#fff;
       background:linear-gradient(135deg,var(--accent),var(--deep));
@@ -842,7 +848,7 @@
     .checkout-step.active{display:block}
     .cart-line{
       display:grid;
-      grid-template-columns:92px 1fr auto;
+      grid-template-columns:92px 1fr auto auto;
       gap:16px;
       align-items:center;
       border:1px solid var(--line);
@@ -887,6 +893,26 @@
       font-weight:950;
       color:var(--deep);
       white-space:nowrap;
+    }
+    .cart-remove{
+      min-width:44px;
+      min-height:42px;
+      border:1px solid #eadbd6;
+      border-radius:999px;
+      background:#fff;
+      color:#7a4d57;
+      font-size:13px;
+      font-weight:950;
+      padding:10px 12px;
+    }
+    .cart-empty{
+      border:1px dashed #d8c7bd;
+      border-radius:24px;
+      padding:18px;
+      background:#fffdf9;
+      color:var(--muted);
+      font-weight:850;
+      text-align:center;
     }
     .checkout-form{
       display:grid;
@@ -1334,11 +1360,16 @@
       .payment-tags,.delivery-grid{grid-template-columns:1fr}
       .color-card{flex-basis:min(44vw, 152px)}
       .cart-line{
-        grid-template-columns:70px 1fr;
+        grid-template-columns:70px 1fr auto;
       }
       .cart-price{
         grid-column:2;
         text-align:left;
+      }
+      .cart-remove{
+        grid-column:3;
+        grid-row:1 / span 2;
+        align-self:center;
       }
       .cart-thumb{width:70px;height:70px;border-radius:18px}
       .checkout-form{grid-template-columns:1fr}
@@ -1542,8 +1573,8 @@
             </div>
 
             <div class="product-actions">
-              <button class="btn secondary" onclick="openCheckout()">Add to Cart</button>
-              <button class="btn primary" onclick="openCheckout()">Buy Now</button>
+              <button class="btn secondary" onclick="addToCartSelected()">Add to Cart</button>
+              <button class="btn primary" onclick="buyNowSelected()">Buy Now</button>
             </div>
 
             <div class="product-help">After checkout, your order number will be sent to WhatsApp for confirmation.</div>
@@ -1730,7 +1761,7 @@
               </div>
               <div class="checkout-actions">
                 <button class="btn secondary" onclick="closeCheckout()">Keep Browsing</button>
-                <button class="btn primary" onclick="goStep(2)">Continue to Details</button>
+                <button class="btn primary" id="continueDetailsButton" onclick="if(cart.length){goStep(2)}">Continue to Details</button>
               </div>
             </section>
 
@@ -2218,8 +2249,18 @@
       }
     }
 
-    function openCheckout(){
+    function addToCartSelected(){
       addSelectedToCart();
+      openCheckout();
+    }
+
+    function buyNowSelected(){
+      cart = [];
+      addSelectedToCart();
+      openCheckout();
+    }
+
+    function openCheckout(){
       checkoutBackdrop.classList.add("active");
       fixedOrder.classList.add("hidden");
       checkoutBackdrop.scrollTop = 0;
@@ -2278,7 +2319,13 @@
       scrollCheckoutToTop();
     }
 
-    function itemLine(item, compact){
+    function removeCartItem(index){
+      cart.splice(index, 1);
+      renderCart();
+      updateSummary();
+    }
+
+    function itemLine(item, compact, index){
       const line = document.createElement("div");
       line.className = compact ? "mini-cart-line" : "cart-line";
 
@@ -2315,33 +2362,47 @@
       price.textContent = money(item.quantity * BASE_PRICE);
 
       line.append(thumb, details, price);
+
+      if(!compact){
+        const remove = document.createElement("button");
+        remove.type = "button";
+        remove.className = "cart-remove";
+        remove.textContent = "Remove";
+        remove.addEventListener("click", () => removeCartItem(index));
+        line.appendChild(remove);
+      }
+
       return line;
     }
 
     function renderCart(){
-      if(!cart.length){
-        const colourIndex = colours.findIndex((c) => c.name === selectedColour);
-        const colourObj = colours[colourIndex];
-        cart.push({
-          colour: selectedColour,
-          colourValue: selectedColourValue,
-          colourIndex: colourIndex >= 0 ? colourIndex : -1,
-          imageUrl: (colourObj && colourObj.imageUrl) ? colourObj.imageUrl : "",
-          quantity
-        });
-      }
-
       const cartItems = document.getElementById("cartItems");
       const orderSummaryItems = document.getElementById("orderSummaryItems");
       cartItems.innerHTML = "";
       orderSummaryItems.innerHTML = "";
 
-      cart.forEach((item) => {
-        cartItems.appendChild(itemLine(item, false));
-        orderSummaryItems.appendChild(itemLine(item, true));
+      if(!cart.length){
+        const empty = document.createElement("div");
+        empty.className = "cart-empty";
+        empty.textContent = "Your cart is empty. Please add a colour before continuing.";
+        cartItems.appendChild(empty);
+      }
+
+      cart.forEach((item, index) => {
+        cartItems.appendChild(itemLine(item, false, index));
+        orderSummaryItems.appendChild(itemLine(item, true, index));
       });
 
       document.getElementById("cartSubtotal").textContent = money(subtotal());
+      updateCartActions();
+    }
+
+    function updateCartActions(){
+      const continueButton = document.getElementById("continueDetailsButton");
+      if(continueButton){
+        continueButton.disabled = !cart.length;
+        continueButton.setAttribute("aria-disabled", String(!cart.length));
+      }
     }
 
     function renderCountryOptions(query){
@@ -2476,9 +2537,17 @@
       ["summarySubtotal","sideSubtotal"].forEach((id) => document.getElementById(id).textContent = subtotalText);
       ["summaryFee","sideFee"].forEach((id) => document.getElementById(id).textContent = feeText);
       ["summaryTotal","sideTotal"].forEach((id) => document.getElementById(id).textContent = totalText);
+      updateCartActions();
     }
 
     function prepareConfirm(){
+      if(!cart.length){
+        renderCart();
+        updateSummary();
+        goStep(1);
+        return;
+      }
+
       const confirmItems = document.getElementById("confirmItems");
       confirmItems.innerHTML = "";
       cart.forEach((item) => {
@@ -2510,6 +2579,13 @@
     }
 
     async function createOrder(){
+      if(!cart.length){
+        renderCart();
+        updateSummary();
+        goStep(1);
+        return;
+      }
+
       const errorBox = document.getElementById("orderSaveError");
       errorBox.classList.remove("active");
       const now = new Date();
