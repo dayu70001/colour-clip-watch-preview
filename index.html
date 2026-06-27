@@ -242,18 +242,17 @@
       background:rgba(255,255,255,.9);
       border:1px solid var(--line);
       border-radius:30px;
-      padding:24px;
-      min-height:210px;
+      padding:14px;
       box-shadow:0 14px 38px rgba(64,48,56,.07);
-      display:flex;
-      flex-direction:column;
-      justify-content:space-between;
     }
-    .use-icon{
-      width:68px;height:68px;border-radius:24px;
-      background:linear-gradient(135deg,#fff0e7,#eaf1ff);
-      display:flex;align-items:center;justify-content:center;
-      font-size:30px;
+    .use-image{
+      aspect-ratio:4 / 5;
+      border-radius:24px;
+      background:
+        radial-gradient(circle at 50% 42%, rgba(255,255,255,.92) 0 13%, rgba(255,255,255,0) 14%),
+        radial-gradient(circle at 50% 42%, var(--scene-c) 0 28%, rgba(255,255,255,0) 29%),
+        linear-gradient(145deg,#fff,#fff0e7 48%,#eaf1ff);
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.72);
       margin-bottom:18px;
     }
     .use-card h3{
@@ -531,10 +530,36 @@
       grid-template-columns:1fr 1fr;
       gap:16px;
     }
+    .info-card.wide{
+      grid-column:1 / -1;
+    }
     .payment-tags{
       display:grid;
+      grid-template-columns:repeat(3,1fr);
       gap:10px;
       margin-top:14px;
+    }
+    .delivery-grid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:10px;
+      margin-top:14px;
+    }
+    .delivery-card{
+      border:1px solid #eadbd6;
+      border-radius:18px;
+      padding:14px;
+      background:#fffdf9;
+    }
+    .delivery-card b{
+      display:block;
+      color:var(--deep);
+      margin-bottom:6px;
+    }
+    .delivery-card p{
+      margin:0;
+      color:var(--muted);
+      font-size:13px;
     }
     .pay-tag{
       display:flex;
@@ -1084,6 +1109,7 @@
       .checkout-body{padding:16px}
       .checkout-layout{grid-template-columns:1fr}
       .order-summary{position:static;border-radius:24px}
+      .payment-tags,.delivery-grid{grid-template-columns:1fr}
       .cart-line{
         grid-template-columns:70px 1fr;
       }
@@ -1187,27 +1213,21 @@
 
           <div class="use-grid">
             <article class="use-card">
-              <div>
-                <div class="use-icon">⌚</div>
-                <h3>Wrist</h3>
-                <p>Wear it as a casual daily watch.</p>
-              </div>
+              <div class="use-image" style="--scene-c:#a7d8ff"></div>
+              <h3>Wrist</h3>
+              <p>Wear it as a casual daily watch.</p>
             </article>
 
             <article class="use-card">
-              <div>
-                <div class="use-icon">🎒</div>
-                <h3>Bag</h3>
-                <p>Clip it to your bag or backpack.</p>
-              </div>
+              <div class="use-image" style="--scene-c:#f9a8d4"></div>
+              <h3>Bag</h3>
+              <p>Clip it to your bag or backpack.</p>
             </article>
 
             <article class="use-card">
-              <div>
-                <div class="use-icon">🔑</div>
-                <h3>Keys</h3>
-                <p>Carry it as a small everyday accessory.</p>
-              </div>
+              <div class="use-image" style="--scene-c:#a7f3d0"></div>
+              <h3>Keys</h3>
+              <p>Carry it as a small everyday accessory.</p>
             </article>
           </div>
         </div>
@@ -1276,7 +1296,7 @@
       <section class="section">
         <div class="container">
           <h2>Why people like it.</h2>
-          <p class="section-sub">Short product reasons below the product card, so customers can keep browsing before they decide.</p>
+          <p class="section-sub">Small, lightweight and easy to carry — made for daily use on your wrist, bag or keys.</p>
 
           <div class="reasons">
             <article class="reason-card">
@@ -1298,7 +1318,7 @@
       <section class="section">
         <div class="container">
           <h2>What customers say.</h2>
-          <p class="section-sub">Short reviews with customer name and location to build trust before checkout.</p>
+          <p class="section-sub">Simple feedback from customers who use it for everyday styling.</p>
 
           <div class="review-grid">
             <article class="review-card">
@@ -1322,16 +1342,16 @@
 
       <section class="section">
         <div class="container">
-          <h2>Payment and shipping.</h2>
-          <p class="section-sub">Show the key order details before checkout, so customers know what to expect.</p>
+          <h2>Payment and delivery.</h2>
+          <p class="section-sub">Clear payment options and tracked delivery information before you place your order.</p>
 
           <div class="info-grid">
-            <article class="info-card">
+            <article class="info-card wide">
               <h3>Payment options</h3>
-              <p>Choose your payment method during checkout.</p>
+              <p>Choose the payment method that works best for you.</p>
               <div class="payment-tags">
                 <div class="pay-tag">
-                  <div><b>PayPal</b><br><span>Extra 5% handling fee.</span></div>
+                  <div><b>PayPal</b><br><span>Fast checkout with a 5% handling fee.</span></div>
                   <div class="badge plus">+5%</div>
                 </div>
                 <div class="pay-tag">
@@ -1345,13 +1365,22 @@
               </div>
             </article>
 
-            <article class="info-card">
+            <article class="info-card wide">
               <h3>Shipping & delivery</h3>
-              <p>We ship from Hong Kong to Europe with tracked delivery.</p>
-              <br>
-              <p>Estimated delivery time: <b>7–10 working days</b>.</p>
-              <br>
-              <p>Orders are usually shipped with <b>DHL</b> or <b>Royal Mail</b>, depending on the destination country and delivery route.</p>
+              <div class="delivery-grid">
+                <div class="delivery-card">
+                  <b>Ships from Hong Kong</b>
+                  <p>Your order is prepared and shipped with tracked delivery.</p>
+                </div>
+                <div class="delivery-card">
+                  <b>Estimated delivery</b>
+                  <p>Delivery to Europe usually takes 7–10 working days after dispatch.</p>
+                </div>
+                <div class="delivery-card">
+                  <b>Delivery route</b>
+                  <p>Courier may be DHL or Royal Mail depending on destination country and delivery route.</p>
+                </div>
+              </div>
             </article>
           </div>
         </div>
@@ -1360,44 +1389,24 @@
       <section class="section">
         <div class="container">
           <h2>FAQ</h2>
-          <p class="section-sub">Common questions before customers enter checkout.</p>
+          <p class="section-sub">Quick answers before you order.</p>
 
           <div class="faq-grid">
             <article class="faq-item">
-              <h3>Can I wear it on my wrist?</h3>
-              <p>Yes, it can be worn as a casual daily watch accessory.</p>
-            </article>
-            <article class="faq-item">
-              <h3>Can I clip it to a bag?</h3>
-              <p>Yes, it can be attached to bags, backpacks or keys.</p>
-            </article>
-            <article class="faq-item">
-              <h3>Where do you ship from?</h3>
-              <p>We ship from Hong Kong.</p>
+              <h3>Can I wear it or clip it to a bag?</h3>
+              <p>Yes. You can wear it on your wrist, clip it to your bag or backpack, or carry it with your keys as a small everyday accessory.</p>
             </article>
             <article class="faq-item">
               <h3>How long does delivery take?</h3>
-              <p>Delivery to Europe usually takes 7–10 working days.</p>
-            </article>
-            <article class="faq-item">
-              <h3>Which courier do you use?</h3>
-              <p>Orders are usually shipped with DHL or Royal Mail, depending on the destination country and delivery route.</p>
+              <p>We ship from Hong Kong with tracked delivery. Delivery to Europe usually takes 7–10 working days after dispatch, depending on destination and route.</p>
             </article>
             <article class="faq-item">
               <h3>What payment methods do you support?</h3>
-              <p>PayPal, bank transfer and crypto payment. PayPal includes an extra 5% handling fee.</p>
-            </article>
-            <article class="faq-item">
-              <h3>What information is required for checkout?</h3>
-              <p>Email, full name, phone number, address line 1, city, state or region, postcode and country are required.</p>
+              <p>PayPal, bank transfer and crypto payment are available. PayPal includes a 5% handling fee. Bank transfer and crypto payment have no extra handling fee.</p>
             </article>
             <article class="faq-item">
               <h3>What happens after I place an order?</h3>
-              <p>You receive an order number and continue on WhatsApp to confirm the order and payment.</p>
-            </article>
-            <article class="faq-item">
-              <h3>Can I return or exchange my order?</h3>
-              <p>If there is a problem with your order, please contact us on WhatsApp with your order number and clear photos within 7 days of delivery. We will help check the issue and arrange a suitable solution.</p>
+              <p>Your order number is created first. Continue on WhatsApp with that order number so we can confirm your order.</p>
             </article>
             <article class="faq-item">
               <h3>What if the item arrives damaged or wrong?</h3>
@@ -1406,10 +1415,6 @@
             <article class="faq-item">
               <h3>How do you use my checkout details?</h3>
               <p>Your email, phone number and shipping address are only used to confirm your order and arrange delivery. We do not sell your personal information.</p>
-            </article>
-            <article class="faq-item">
-              <h3>How can I contact you after ordering?</h3>
-              <p>After creating your order number, continue on WhatsApp and send the order number so we can confirm your order and payment details.</p>
             </article>
           </div>
         </div>
