@@ -1,0 +1,1861 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Colour Clip Watch Landing + Checkout Preview V2</title>
+  <style>
+    :root{
+      --bg:#fff9f2;
+      --cream:#fffdf8;
+      --card:#ffffff;
+      --soft:#f7f0e9;
+      --line:#eadfd6;
+      --text:#252127;
+      --muted:#71676b;
+      --deep:#302b3e;
+      --deep2:#1f1b28;
+      --accent:#d86f8f;
+      --blue:#7899c8;
+      --gold:#b98b5f;
+      --green:#16a34a;
+      --danger:#b45309;
+      --shadow:0 22px 60px rgba(64,48,56,.12);
+      --radius:30px;
+    }
+
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at 7% 0%, rgba(255,222,231,.76), rgba(255,222,231,0) 32%),
+        radial-gradient(circle at 93% 2%, rgba(218,231,255,.82), rgba(218,231,255,0) 34%),
+        linear-gradient(180deg,var(--bg),#fff 54%,#fffaf5);
+      line-height:1.5;
+      overflow-x:hidden;
+    }
+
+    button,input,textarea{font:inherit}
+    button{cursor:pointer}
+    a{text-decoration:none;color:inherit}
+    .page{min-height:100vh;padding-bottom:106px}
+    .container{max-width:1120px;margin:0 auto}
+
+    .nav{
+      position:sticky;
+      top:0;
+      z-index:80;
+      background:rgba(255,249,242,.86);
+      border-bottom:1px solid rgba(234,223,214,.78);
+      backdrop-filter:blur(18px);
+      -webkit-backdrop-filter:blur(18px);
+    }
+    .nav-inner{
+      max-width:1120px;
+      margin:0 auto;
+      padding:14px 20px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:18px;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-weight:950;
+      color:var(--deep);
+      letter-spacing:.02em;
+    }
+    .brand-mark{
+      width:28px;height:28px;border-radius:50%;
+      background:linear-gradient(135deg,var(--accent),var(--blue));
+      box-shadow:0 9px 20px rgba(120,153,200,.25);
+      position:relative;
+    }
+    .brand-mark::after{
+      content:"";
+      position:absolute;inset:8px;border-radius:50%;
+      background:#fff;opacity:.85;
+    }
+    .nav-note{
+      color:var(--muted);
+      font-size:13px;
+      font-weight:800;
+      white-space:nowrap;
+    }
+
+    .hero{padding:50px 20px 34px}
+    .hero-grid{
+      display:grid;
+      grid-template-columns:1.02fr .98fr;
+      gap:34px;
+      align-items:center;
+    }
+    .eyebrow{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 13px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.8);
+      border-radius:999px;
+      color:#55495a;
+      font-size:13px;
+      font-weight:850;
+      box-shadow:0 12px 28px rgba(64,48,56,.06);
+      margin-bottom:18px;
+    }
+    .hero h1{
+      margin:0;
+      max-width:650px;
+      font-size:clamp(46px,7vw,84px);
+      line-height:.94;
+      letter-spacing:-.066em;
+      color:var(--deep);
+    }
+    .hero h1 span{color:var(--blue)}
+    .hero p{
+      margin:20px 0 0;
+      max-width:590px;
+      color:#655c62;
+      font-size:18px;
+    }
+    .hero-hint{
+      margin-top:24px;
+      color:#7d7275;
+      font-size:14px;
+      font-weight:800;
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    .hero-hint::before{
+      content:"";
+      width:34px;height:1px;background:#d8c7bd;
+    }
+
+    .visual{
+      min-height:560px;
+      border-radius:44px;
+      border:1px solid rgba(255,255,255,.86);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+      position:relative;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(255,255,255,.94) 0 9%, rgba(255,255,255,0) 30%),
+        linear-gradient(145deg,#fff,#fff0e7 47%,#eaf1ff);
+    }
+    .visual::before{
+      content:"";
+      position:absolute;
+      width:370px;height:370px;border-radius:50%;
+      right:-110px;bottom:-108px;
+      background:rgba(120,153,200,.17);
+    }
+    .visual-label{
+      position:absolute;
+      left:24px;bottom:24px;
+      background:rgba(255,255,255,.82);
+      backdrop-filter:blur(14px);
+      border:1px solid rgba(255,255,255,.9);
+      border-radius:999px;
+      padding:12px 15px;
+      color:#4e424b;
+      font-size:13px;
+      font-weight:950;
+      box-shadow:0 14px 34px rgba(64,48,56,.08);
+    }
+
+    .watch{
+      position:absolute;
+      width:112px;height:112px;border-radius:50%;
+      background:var(--watch);
+      box-shadow:
+        inset 0 0 0 9px rgba(255,255,255,.47),
+        inset 0 0 0 18px rgba(48,43,62,.07),
+        0 18px 36px rgba(64,48,56,.18);
+    }
+    .watch::before{
+      content:"";
+      position:absolute;
+      top:-26px;left:50%;transform:translateX(-50%);
+      width:38px;height:42px;
+      border-radius:24px 24px 14px 14px;
+      background:var(--watch);
+      box-shadow:inset 0 0 0 8px rgba(255,255,255,.42);
+    }
+    .watch::after{
+      content:"";
+      position:absolute;
+      inset:33px;border-radius:50%;
+      background:#fff;border:1px solid rgba(48,43,62,.08);
+      z-index:1;
+    }
+    .hand,.hand2{
+      position:absolute;
+      z-index:2;
+      left:50%;top:50%;
+      width:3px;height:28px;
+      background:#312b3e;
+      border-radius:4px;
+      transform-origin:bottom;
+      transform:translate(-50%,-100%) rotate(32deg);
+    }
+    .hand2{height:20px;opacity:.55;transform:translate(-50%,-100%) rotate(116deg)}
+    .v1{--watch:#a7d8ff;left:36%;top:34%;width:190px;height:190px}
+    .v1::before{width:56px;height:64px;top:-40px}
+    .v1::after{inset:56px}
+    .v1 .hand{height:48px}.v1 .hand2{height:34px}
+    .v2{--watch:#f9a8d4;left:11%;top:18%}
+    .v3{--watch:#fff;right:12%;top:14%}
+    .v4{--watch:#a7f3d0;left:10%;bottom:18%}
+    .v5{--watch:#111;right:12%;bottom:16%}
+    .v6{--watch:#ffae71;left:39%;top:9%}
+    .v7{--watch:#ffe66d;left:35%;bottom:7%}
+    .v8{--watch:#cdb8ff;right:28%;bottom:28%}
+
+    .section{padding:50px 20px}
+    .section h2{
+      margin:0 0 12px;
+      font-size:clamp(31px,4.4vw,52px);
+      line-height:1.04;
+      letter-spacing:-.048em;
+      color:var(--deep);
+    }
+    .section-sub{
+      max-width:740px;
+      margin:0 0 26px;
+      color:#6b6267;
+      font-size:17px;
+    }
+
+    .use-grid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:16px;
+    }
+    .use-card{
+      background:rgba(255,255,255,.9);
+      border:1px solid var(--line);
+      border-radius:30px;
+      padding:24px;
+      min-height:210px;
+      box-shadow:0 14px 38px rgba(64,48,56,.07);
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+    }
+    .use-icon{
+      width:68px;height:68px;border-radius:24px;
+      background:linear-gradient(135deg,#fff0e7,#eaf1ff);
+      display:flex;align-items:center;justify-content:center;
+      font-size:30px;
+      margin-bottom:18px;
+    }
+    .use-card h3{
+      margin:0 0 8px;
+      color:var(--deep);
+      font-size:23px;
+      letter-spacing:-.03em;
+    }
+    .use-card p{margin:0;color:var(--muted)}
+
+    .colors-section{background:linear-gradient(180deg,rgba(255,255,255,0),#fff7f1)}
+    .color-grid{
+      display:grid;
+      grid-template-columns:repeat(8,1fr);
+      gap:12px;
+    }
+    .color-card{
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:24px;
+      padding:14px 10px;
+      text-align:center;
+      box-shadow:0 12px 30px rgba(64,48,56,.07);
+    }
+    .color-dot{
+      width:58px;height:58px;border-radius:50%;
+      margin:0 auto 10px;
+      background:var(--c);
+      border:1px solid rgba(48,43,62,.12);
+      box-shadow:inset 0 0 0 8px rgba(255,255,255,.42);
+    }
+    .color-card b{
+      display:block;
+      color:#453b45;
+      font-size:13px;
+      line-height:1.2;
+    }
+
+    .product-section{
+      padding:56px 20px;
+      background:#fffaf5;
+    }
+    .product-card{
+      max-width:1120px;
+      margin:0 auto;
+      display:grid;
+      grid-template-columns:.95fr 1.05fr;
+      gap:26px;
+      align-items:stretch;
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:42px;
+      padding:24px;
+      box-shadow:var(--shadow);
+    }
+    .product-media{
+      background:linear-gradient(145deg,#fff,#fff0e7 47%,#eaf1ff);
+      border-radius:32px;
+      min-height:510px;
+      position:relative;
+      overflow:hidden;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .product-media::before{
+      content:"";
+      position:absolute;
+      width:300px;height:300px;border-radius:50%;
+      background:rgba(255,255,255,.45);
+    }
+    .product-watch{
+      position:relative;
+      width:230px;height:230px;border-radius:50%;
+      background:var(--product-c);
+      box-shadow:
+        inset 0 0 0 17px rgba(255,255,255,.48),
+        inset 0 0 0 31px rgba(48,43,62,.07),
+        0 28px 60px rgba(64,48,56,.22);
+    }
+    .product-watch::before{
+      content:"";
+      position:absolute;
+      top:-44px;left:50%;transform:translateX(-50%);
+      width:60px;height:70px;border-radius:36px 36px 20px 20px;
+      background:var(--product-c);
+      box-shadow:inset 0 0 0 13px rgba(255,255,255,.42);
+    }
+    .product-watch::after{
+      content:"";
+      position:absolute;
+      inset:64px;border-radius:50%;
+      background:#fff;border:1px solid rgba(48,43,62,.08);
+      z-index:1;
+    }
+    .product-watch .hand{height:54px}
+    .product-watch .hand2{height:38px}
+    .product-label{
+      position:absolute;
+      left:18px;right:18px;bottom:18px;
+      background:rgba(255,255,255,.82);
+      border:1px solid rgba(255,255,255,.9);
+      color:var(--deep);
+      border-radius:20px;
+      padding:14px 16px;
+      font-weight:950;
+      backdrop-filter:blur(14px);
+    }
+    .product-info{
+      padding:8px 4px 8px 4px;
+    }
+    .available{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:8px 12px;border-radius:999px;
+      background:#f0fdf4;color:#166534;
+      font-size:13px;font-weight:950;
+      margin-bottom:14px;
+    }
+    .pulse{width:8px;height:8px;border-radius:50%;background:var(--green)}
+    .product-info h2{
+      margin:0;
+      color:var(--deep);
+      font-size:clamp(34px,4vw,52px);
+      line-height:1;
+      letter-spacing:-.05em;
+    }
+    .price-row{
+      display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;
+      margin-top:12px;
+    }
+    .price{font-size:30px;font-weight:950;color:var(--text)}
+    .price-note{font-size:14px;color:var(--muted)}
+    .product-desc{
+      margin:14px 0 22px;
+      color:#665d62;
+      max-width:560px;
+    }
+    .select-label{
+      display:block;
+      margin:22px 0 10px;
+      font-weight:950;
+      color:#453646;
+    }
+    .choice-grid{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:10px;
+    }
+    .choice{
+      border:1px solid #eadbd6;
+      background:#fff;
+      border-radius:18px;
+      padding:11px 8px;
+      display:flex;align-items:center;gap:8px;
+      color:#453646;
+      font-weight:850;
+      font-size:13px;
+    }
+    .choice.active{
+      border-color:var(--blue);
+      box-shadow:0 0 0 2px var(--blue) inset;
+      background:#f7faff;
+    }
+    .mini-dot{
+      width:22px;height:22px;border-radius:50%;
+      background:var(--c);
+      border:1px solid rgba(48,43,62,.12);
+      flex:0 0 auto;
+    }
+    .qty-row{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      margin-top:10px;
+    }
+    .qty-control{
+      display:inline-flex;
+      align-items:center;
+      border:1px solid var(--line);
+      border-radius:999px;
+      overflow:hidden;
+      background:#fff;
+    }
+    .qty-control button{
+      width:44px;height:44px;border:0;background:#fff;color:var(--deep);
+      font-weight:950;font-size:19px;
+    }
+    .qty-control span{
+      min-width:46px;text-align:center;font-weight:950;
+      color:var(--deep);
+    }
+    .product-actions{
+      display:flex;
+      gap:12px;
+      margin-top:24px;
+      flex-wrap:wrap;
+    }
+    .btn{
+      border:0;
+      border-radius:999px;
+      padding:15px 24px;
+      font-weight:950;
+      font-size:15px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      transition:transform .18s ease, box-shadow .18s ease;
+      text-decoration:none;
+    }
+    .btn:hover{transform:translateY(-1px)}
+    .btn.primary{
+      color:#fff;
+      background:linear-gradient(135deg,var(--accent),var(--deep));
+      box-shadow:0 16px 38px rgba(80,48,72,.25);
+    }
+    .btn.secondary{
+      color:var(--deep);
+      background:#fff;
+      border:1px solid var(--line);
+      box-shadow:0 12px 28px rgba(64,48,56,.06);
+    }
+    .product-help{
+      margin-top:16px;
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    .reasons{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:16px;
+    }
+    .reason-card,.review-card,.info-card,.faq-item{
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:28px;
+      padding:22px;
+      box-shadow:0 14px 36px rgba(64,48,56,.06);
+    }
+    .reason-card h3,.info-card h3{
+      margin:0 0 8px;
+      color:var(--deep);
+      font-size:21px;
+      letter-spacing:-.02em;
+    }
+    .reason-card p,.info-card p{
+      margin:0;
+      color:var(--muted);
+    }
+
+    .review-grid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:16px;
+    }
+    .stars{
+      color:#b98545;
+      letter-spacing:1px;
+      font-size:14px;
+      margin-bottom:10px;
+    }
+    .review-card p{
+      margin:0 0 14px;
+      color:#463c44;
+      font-size:16px;
+    }
+    .review-card b{
+      color:var(--deep);
+      font-size:14px;
+    }
+
+    .info-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:16px;
+    }
+    .payment-tags{
+      display:grid;
+      gap:10px;
+      margin-top:14px;
+    }
+    .pay-tag{
+      display:flex;
+      justify-content:space-between;
+      gap:14px;
+      border:1px solid #eadbd6;
+      border-radius:18px;
+      padding:14px;
+      background:#fffdf9;
+    }
+    .pay-tag b{color:var(--deep)}
+    .pay-tag span{color:var(--muted);font-size:13px}
+    .badge{
+      flex:0 0 auto;
+      border-radius:999px;
+      padding:6px 9px;
+      background:#f3eee9;
+      color:#4d4048;
+      font-size:13px;
+      font-weight:950;
+    }
+    .badge.plus{background:#fff1e8;color:var(--danger)}
+
+    .faq-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+    }
+    .faq-item h3{
+      margin:0 0 8px;
+      color:var(--deep);
+      font-size:18px;
+    }
+    .faq-item p{
+      margin:0;
+      color:var(--muted);
+    }
+    .footer{
+      background:var(--deep2);
+      color:#cec6cc;
+      text-align:center;
+      padding:34px 20px;
+      font-size:13px;
+    }
+
+    .fixed-order{
+      position:fixed;
+      z-index:110;
+      left:16px;right:16px;bottom:16px;
+      max-width:640px;
+      min-height:72px;
+      margin:0 auto;
+      padding:12px 12px 12px 22px;
+      background:linear-gradient(135deg,#d86f8f,#302b3e);
+      color:#fff;
+      border-radius:999px;
+      box-shadow:0 22px 52px rgba(60,44,55,.28);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      transition:opacity .22s ease, transform .22s ease;
+    }
+    .fixed-order.hidden{
+      opacity:0;
+      transform:translateY(28px);
+      pointer-events:none;
+    }
+    .fixed-copy b{
+      display:block;
+      font-size:17px;
+      line-height:1.1;
+    }
+    .fixed-copy span{
+      display:block;
+      margin-top:3px;
+      color:rgba(255,255,255,.86);
+      font-size:14px;
+      line-height:1.2;
+    }
+    .fixed-order button{
+      border:0;background:#fff;color:var(--deep);
+      border-radius:999px;
+      padding:16px 26px;
+      font-size:16px;font-weight:950;
+      min-height:48px;white-space:nowrap;
+    }
+
+    .checkout-backdrop{
+      position:fixed;
+      inset:0;
+      z-index:200;
+      display:none;
+      background:rgba(31,27,40,.58);
+      backdrop-filter:blur(10px);
+      -webkit-backdrop-filter:blur(10px);
+      padding:24px;
+      overflow:auto;
+    }
+    .checkout-backdrop.active{display:block}
+    .checkout{
+      max-width:1080px;
+      margin:28px auto;
+      background:#fff;
+      border-radius:34px;
+      box-shadow:0 34px 100px rgba(0,0,0,.28);
+      overflow:hidden;
+      color:var(--text);
+    }
+    .checkout-head{
+      padding:20px 22px;
+      border-bottom:1px solid var(--line);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:18px;
+      background:#fffdf8;
+    }
+    .checkout-head h2{
+      margin:0;
+      color:var(--deep);
+      font-size:24px;
+      letter-spacing:-.035em;
+    }
+    .close{
+      width:40px;height:40px;border:0;border-radius:50%;
+      background:#f4eee8;color:var(--deep);
+      font-size:22px;font-weight:900;
+    }
+    .steps{
+      padding:16px 22px;
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:8px;
+      background:#fff;
+      border-bottom:1px solid var(--line);
+    }
+    .step-pill{
+      border-radius:999px;
+      background:#f4eee8;
+      color:#796d72;
+      padding:9px 10px;
+      text-align:center;
+      font-size:13px;
+      font-weight:900;
+    }
+    .step-pill.active{
+      background:linear-gradient(135deg,var(--accent),var(--blue));
+      color:#fff;
+    }
+    .checkout-body{
+      padding:24px;
+    }
+    .checkout-layout{
+      display:block;
+    }
+    .order-summary{
+      display:none;
+      border:1px solid var(--line);
+      border-radius:28px;
+      padding:18px;
+      background:#fffdf9;
+      position:sticky;
+      top:18px;
+    }
+    .order-summary h3{
+      margin:0 0 14px;
+      color:var(--deep);
+      letter-spacing:-.025em;
+    }
+    .summary-items,.cart-items,.confirm-items{
+      display:grid;
+      gap:10px;
+    }
+    .mini-cart-line{
+      display:grid;
+      grid-template-columns:34px 1fr auto;
+      gap:10px;
+      align-items:center;
+      color:#5f565d;
+      font-size:14px;
+    }
+    .mini-cart-line b{color:var(--deep)}
+    .mini-cart-line .tiny-watch{
+      width:34px;height:34px;
+    }
+    .mini-cart-line .tiny-watch::after{inset:11px}
+    .summary-meta{
+      display:grid;
+      gap:8px;
+      margin-top:14px;
+      padding-top:14px;
+      border-top:1px solid var(--line);
+      color:var(--muted);
+      font-size:13px;
+      font-weight:800;
+    }
+    .checkout-main{
+      min-width:0;
+    }
+    .checkout.success-only .steps{
+      display:none;
+    }
+    .checkout-step{display:none}
+    .checkout-step.active{display:block}
+    .cart-line{
+      display:grid;
+      grid-template-columns:92px 1fr auto;
+      gap:16px;
+      align-items:center;
+      border:1px solid var(--line);
+      border-radius:24px;
+      padding:14px;
+      background:#fffdf9;
+    }
+    .cart-thumb{
+      width:92px;height:92px;border-radius:22px;
+      background:linear-gradient(145deg,#fff,#fff0e7);
+      display:flex;align-items:center;justify-content:center;
+    }
+    .tiny-watch{
+      width:54px;height:54px;border-radius:50%;
+      background:var(--product-c);
+      box-shadow:inset 0 0 0 6px rgba(255,255,255,.45);
+      position:relative;
+    }
+    .tiny-watch::after{
+      content:"";
+      position:absolute;inset:18px;border-radius:50%;background:#fff;
+    }
+    .cart-line h3{
+      margin:0 0 4px;
+      color:var(--deep);
+    }
+    .cart-step-title{
+      margin:0 0 14px;
+      color:var(--deep);
+      font-size:24px;
+      letter-spacing:-.035em;
+    }
+    .cart-line p{
+      margin:0;
+      color:var(--muted);
+      font-size:14px;
+    }
+    .cart-price{
+      text-align:right;
+      font-weight:950;
+      color:var(--deep);
+      white-space:nowrap;
+    }
+    .checkout-form{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+    }
+    input,textarea{
+      width:100%;
+      border:1px solid #eadbd6;
+      background:#fff;
+      color:var(--text);
+      border-radius:18px;
+      padding:14px;
+      outline:none;
+      font-size:15px;
+    }
+    textarea{resize:vertical;min-height:92px}
+    input:focus,textarea:focus{
+      border-color:var(--blue);
+      box-shadow:0 0 0 3px rgba(120,153,200,.14);
+    }
+    .country-select{
+      position:relative;
+    }
+    .country-options{
+      position:absolute;
+      left:0;
+      right:0;
+      top:calc(100% + 8px);
+      z-index:8;
+      max-height:230px;
+      overflow:auto;
+      border:1px solid #eadbd6;
+      border-radius:18px;
+      background:#fff;
+      box-shadow:0 18px 48px rgba(64,48,56,.16);
+      padding:6px;
+      display:none;
+    }
+    .country-select.open .country-options{
+      display:block;
+    }
+    .country-option{
+      width:100%;
+      border:0;
+      background:#fff;
+      border-radius:14px;
+      padding:11px 12px;
+      text-align:left;
+      color:var(--text);
+      font-weight:800;
+    }
+    .country-option:hover,
+    .country-option.active{
+      background:#f7faff;
+      color:var(--deep);
+    }
+    .country-empty{
+      padding:12px;
+      color:var(--muted);
+      font-weight:850;
+    }
+    .full{grid-column:1 / -1}
+    .checkout-payment{
+      display:grid;
+      gap:10px;
+    }
+    .payment-option{
+      border:1px solid #eadbd6;
+      border-radius:20px;
+      background:#fff;
+      padding:14px;
+      display:flex;
+      justify-content:space-between;
+      gap:16px;
+      align-items:flex-start;
+    }
+    .payment-option.active{
+      border-color:var(--blue);
+      box-shadow:0 0 0 2px var(--blue) inset;
+      background:#f7faff;
+    }
+    .payment-option b{display:block;color:var(--deep)}
+    .payment-option span{display:block;color:var(--muted);font-size:13px;margin-top:3px}
+    .summary-box{
+      margin-top:18px;
+      border:1px solid var(--line);
+      border-radius:24px;
+      padding:16px;
+      background:#fffdf9;
+      display:grid;
+      gap:9px;
+    }
+    .summary-row{
+      display:flex;
+      justify-content:space-between;
+      gap:16px;
+    }
+    .summary-row.total{
+      border-top:1px solid var(--line);
+      padding-top:10px;
+      margin-top:3px;
+      font-size:20px;
+      font-weight:950;
+      color:var(--deep);
+    }
+    .confirm-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+    }
+    .confirm-card{
+      border:1px solid var(--line);
+      border-radius:24px;
+      padding:16px;
+      background:#fffdf9;
+    }
+    .confirm-card h3{
+      margin:0 0 10px;
+      color:var(--deep);
+    }
+    .confirm-card p{
+      margin:6px 0;
+      color:#5f565d;
+      font-size:14px;
+    }
+    .confirm-item-line{
+      display:flex;
+      justify-content:space-between;
+      gap:14px;
+      border-top:1px solid var(--line);
+      padding-top:8px;
+      color:#5f565d;
+      font-size:14px;
+    }
+    .confirm-item-line:first-child{border-top:0;padding-top:0}
+    .confirm-item-line b{color:var(--deep)}
+    .success{
+      text-align:center;
+      padding:22px 8px 10px;
+    }
+    .success .ok{
+      width:64px;height:64px;border-radius:50%;
+      background:#dcfce7;color:#166534;
+      display:flex;align-items:center;justify-content:center;
+      margin:0 auto 16px;
+      font-size:30px;font-weight:950;
+    }
+    .success h3{
+      margin:0 0 8px;
+      color:var(--deep);
+      font-size:30px;
+      letter-spacing:-.04em;
+    }
+    .success p{color:var(--muted)}
+    .order-no{
+      display:inline-block;
+      margin:8px 0 18px;
+      padding:10px 14px;
+      border-radius:999px;
+      background:#f4eee8;
+      color:var(--deep);
+      font-weight:950;
+    }
+    .checkout-actions{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      margin-top:22px;
+      flex-wrap:wrap;
+    }
+    .checkout-actions .btn{
+      min-width:160px;
+    }
+    .checkout-actions .btn.primary{
+      margin-left:auto;
+    }
+
+    @media(max-width:920px){
+      .hero-grid,.product-card,.info-grid{grid-template-columns:1fr}
+      .visual{min-height:470px}
+      .use-grid,.reasons,.review-grid{grid-template-columns:1fr}
+      .color-grid{
+        display:flex;
+        overflow-x:auto;
+        gap:12px;
+        padding:4px 2px 12px;
+        scroll-snap-type:x mandatory;
+        -webkit-overflow-scrolling:touch;
+      }
+      .color-card{min-width:124px;scroll-snap-align:start}
+      .product-media{min-height:370px}
+      .faq-grid{grid-template-columns:1fr}
+    }
+
+    @media(max-width:620px){
+      .page{padding-bottom:108px}
+      .nav-inner{padding:12px 16px}
+      .nav-note{display:none}
+      .brand{font-size:14px}
+      .brand-mark{width:25px;height:25px}
+      .hero{padding:30px 16px 24px}
+      .eyebrow{font-size:12px;padding:7px 11px;margin-bottom:14px}
+      .hero h1{font-size:44px}
+      .hero p{font-size:16px;margin-top:15px}
+      .visual{min-height:390px;border-radius:30px}
+      .visual-label{left:14px;bottom:14px;font-size:12px}
+      .watch{width:80px;height:80px}
+      .watch::before{width:28px;height:31px;top:-19px}
+      .watch::after{inset:24px}
+      .hand{height:21px}.hand2{height:15px}
+      .v1{width:138px;height:138px;left:31%;top:33%}
+      .v1::before{width:42px;height:50px;top:-31px}
+      .v1::after{inset:40px}
+      .v1 .hand{height:35px}.v1 .hand2{height:24px}
+      .v2{left:8%;top:16%}.v3{right:8%;top:16%}
+      .v4{left:8%;bottom:19%}.v5{right:8%;bottom:18%}
+      .v6{left:38%;top:8%}.v7{left:32%;bottom:6%}.v8{right:25%;bottom:30%}
+
+      .section{padding:38px 16px}
+      .section h2{font-size:33px}
+      .section-sub{font-size:15px;margin-bottom:20px}
+      .use-card,.reason-card,.review-card,.info-card,.faq-item{
+        border-radius:26px;
+        padding:20px;
+      }
+      .use-card{min-height:176px}
+      .use-icon{width:60px;height:60px;border-radius:22px;font-size:27px}
+      .product-section{padding:38px 14px}
+      .product-card{border-radius:30px;padding:14px}
+      .product-media{border-radius:24px;min-height:310px}
+      .product-watch{width:178px;height:178px}
+      .product-watch::before{width:48px;height:54px;top:-34px}
+      .product-watch::after{inset:50px}
+      .product-watch .hand{height:42px}.product-watch .hand2{height:30px}
+      .product-label{left:12px;right:12px;bottom:12px;font-size:14px;border-radius:17px}
+      .product-info{padding:8px 4px 10px}
+      .choice-grid{grid-template-columns:1fr 1fr}
+      .product-actions{display:grid;grid-template-columns:1fr}
+      .product-actions .btn{width:100%}
+
+      .fixed-order{
+        left:12px;right:12px;bottom:14px;
+        min-height:72px;
+        padding:11px 11px 11px 18px;
+        max-width:none;
+      }
+      .fixed-copy b{font-size:16px}
+      .fixed-copy span{font-size:13px}
+      .fixed-order button{padding:14px 20px;font-size:15px}
+
+      .checkout-backdrop{padding:0}
+      .checkout{
+        min-height:100vh;
+        margin:0;
+        border-radius:0;
+      }
+      .checkout-head{padding:16px}
+      .steps{
+        grid-template-columns:repeat(2,1fr);
+        padding:12px 16px;
+      }
+      .checkout-body{padding:16px}
+      .checkout-layout{grid-template-columns:1fr}
+      .order-summary{position:static;border-radius:24px}
+      .cart-line{
+        grid-template-columns:70px 1fr;
+      }
+      .cart-price{
+        grid-column:2;
+        text-align:left;
+      }
+      .cart-thumb{width:70px;height:70px;border-radius:18px}
+      .checkout-form{grid-template-columns:1fr}
+      .full{grid-column:auto}
+      .payment-option{flex-direction:column}
+      .confirm-grid{grid-template-columns:1fr}
+      .confirm-item-line{display:grid;gap:3px}
+      .checkout-actions{display:grid;grid-template-columns:1fr}
+      .checkout-actions .btn{width:100%;min-width:0}
+      .checkout-actions .btn.primary{margin-left:0}
+    }
+
+    @media(max-width:380px){
+      .fixed-copy span{display:none}
+      .fixed-order{min-height:66px}
+      .fixed-order button{padding:13px 18px}
+    }
+  
+    @supports (bottom: env(safe-area-inset-bottom)){
+      .fixed-order{
+        bottom:calc(16px + env(safe-area-inset-bottom));
+      }
+      @media(max-width:620px){
+        .fixed-order{
+          bottom:calc(14px + env(safe-area-inset-bottom));
+        }
+      }
+    }
+
+    @media(max-width:620px){
+      .checkout-head{
+        position:sticky;
+        top:0;
+        z-index:5;
+      }
+      .steps{
+        position:sticky;
+        top:73px;
+        z-index:4;
+      }
+      .checkout-actions{
+        position:sticky;
+        bottom:0;
+        background:linear-gradient(180deg,rgba(255,255,255,0),#fff 22%);
+        padding-top:18px;
+        padding-bottom:calc(12px + env(safe-area-inset-bottom));
+      }
+      .product-card{
+        margin-bottom:84px;
+      }
+      .visual{
+        min-height:350px;
+      }
+    }
+
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="nav">
+      <div class="nav-inner">
+        <div class="brand"><span class="brand-mark"></span> COLOUR CLIP WATCH</div>
+        <div class="nav-note">8 colours · Available to order</div>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="container hero-grid">
+          <div>
+            <div class="eyebrow">8 colours · Wear or clip · Daily accessory</div>
+            <h1>A little <span>colour</span> for every day.</h1>
+            <p>A clip-on watch accessory you can wear on your wrist, attach to your bag, or carry with your keys.</p>
+            <div class="hero-hint">Scroll to explore the collection</div>
+          </div>
+
+          <div class="visual" aria-label="Colour Clip Watch multi-colour visual">
+            <div class="watch v1"><span class="hand"></span><span class="hand2"></span></div>
+            <div class="watch v2"><span class="hand"></span><span class="hand2"></span></div>
+            <div class="watch v3"><span class="hand"></span><span class="hand2"></span></div>
+            <div class="watch v4"><span class="hand"></span><span class="hand2"></span></div>
+            <div class="watch v5"><span class="hand"></span><span class="hand2"></span></div>
+            <div class="watch v6"><span class="hand"></span><span class="hand2"></span></div>
+            <div class="watch v7"><span class="hand"></span><span class="hand2"></span></div>
+            <div class="watch v8"><span class="hand"></span><span class="hand2"></span></div>
+            <div class="visual-label">8 colours available</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="container">
+          <h2>Wear it. Clip it. Carry it.</h2>
+          <p class="section-sub">A small accessory made for everyday use, from wrist styling to bag details and daily carry.</p>
+
+          <div class="use-grid">
+            <article class="use-card">
+              <div>
+                <div class="use-icon">⌚</div>
+                <h3>Wrist</h3>
+                <p>Wear it as a casual daily watch.</p>
+              </div>
+            </article>
+
+            <article class="use-card">
+              <div>
+                <div class="use-icon">🎒</div>
+                <h3>Bag</h3>
+                <p>Clip it to your bag or backpack.</p>
+              </div>
+            </article>
+
+            <article class="use-card">
+              <div>
+                <div class="use-icon">🔑</div>
+                <h3>Keys</h3>
+                <p>Carry it as a small everyday accessory.</p>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section colors-section">
+        <div class="container">
+          <h2>Choose from 8 colours.</h2>
+          <p class="section-sub">Pick the shade that fits your wrist, bag or everyday carry.</p>
+
+          <div class="color-grid">
+            <div class="color-card"><div class="color-dot" style="--c:#f9a8d4"></div><b>Blush Pink</b></div>
+            <div class="color-card"><div class="color-dot" style="--c:#fff"></div><b>Clean White</b></div>
+            <div class="color-card"><div class="color-dot" style="--c:#a7d8ff"></div><b>Sky Blue</b></div>
+            <div class="color-card"><div class="color-dot" style="--c:#a7f3d0"></div><b>Sage Green</b></div>
+            <div class="color-card"><div class="color-dot" style="--c:#111"></div><b>Classic Black</b></div>
+            <div class="color-card"><div class="color-dot" style="--c:#ffae71"></div><b>Soft Orange</b></div>
+            <div class="color-card"><div class="color-dot" style="--c:#ffe66d"></div><b>Warm Yellow</b></div>
+            <div class="color-card"><div class="color-dot" style="--c:#cdb8ff"></div><b>Soft Purple</b></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="product-section" id="product">
+        <div class="product-card">
+          <div class="product-media">
+            <div class="product-watch" id="productWatch" style="--product-c:#a7d8ff">
+              <span class="hand"></span>
+              <span class="hand2"></span>
+            </div>
+            <div class="product-label" id="productLabel">Selected colour: Sky Blue</div>
+          </div>
+
+          <div class="product-info">
+            <div class="available"><span class="pulse"></span> Available to order</div>
+            <h2>Colour Clip Watch</h2>
+            <div class="price-row">
+              <div class="price">€49.00</div>
+              <div class="price-note">Colour and quantity selectable</div>
+            </div>
+            <p class="product-desc">Choose your colour and quantity, then continue to checkout when you are ready.</p>
+
+            <label class="select-label">Choose colour</label>
+            <div class="choice-grid" id="colourChoices"></div>
+
+            <label class="select-label">Quantity</label>
+            <div class="qty-row">
+              <div class="qty-control">
+                <button type="button" onclick="changeQty(-1)">−</button>
+                <span id="qtyValue">1</span>
+                <button type="button" onclick="changeQty(1)">+</button>
+              </div>
+              <span class="product-help" id="subtotalText">Subtotal: €49.00</span>
+            </div>
+
+            <div class="product-actions">
+              <button class="btn secondary" onclick="openCheckout()">Add to Cart</button>
+              <button class="btn primary" onclick="openCheckout()">Buy Now</button>
+            </div>
+
+            <div class="product-help">After checkout, your order number will be sent to WhatsApp for confirmation.</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="container">
+          <h2>Why people like it.</h2>
+          <p class="section-sub">Short product reasons below the product card, so customers can keep browsing before they decide.</p>
+
+          <div class="reasons">
+            <article class="reason-card">
+              <h3>Easy to match</h3>
+              <p>Works with casual outfits, bags and everyday carry.</p>
+            </article>
+            <article class="reason-card">
+              <h3>Small and lightweight</h3>
+              <p>Easy to wear, clip and carry without feeling bulky.</p>
+            </article>
+            <article class="reason-card">
+              <h3>Gift-friendly</h3>
+              <p>A simple colourful gift option that is easy to choose.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="container">
+          <h2>What customers say.</h2>
+          <p class="section-sub">Short reviews with customer name and location to build trust before checkout.</p>
+
+          <div class="review-grid">
+            <article class="review-card">
+              <div class="stars">★★★★★</div>
+              <p>“Looks nice on my bag. The colour is cute but not too loud.”</p>
+              <b>— Mia · London, United Kingdom</b>
+            </article>
+            <article class="review-card">
+              <div class="stars">★★★★★</div>
+              <p>“I like that I can wear it or clip it to my backpack. Simple and fun.”</p>
+              <b>— Lucas · Berlin, Germany</b>
+            </article>
+            <article class="review-card">
+              <div class="stars">★★★★★</div>
+              <p>“Delivery took around a week and the order was easy to confirm on WhatsApp.”</p>
+              <b>— Emma · Paris, France</b>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="container">
+          <h2>Payment and shipping.</h2>
+          <p class="section-sub">Show the key order details before checkout, so customers know what to expect.</p>
+
+          <div class="info-grid">
+            <article class="info-card">
+              <h3>Payment options</h3>
+              <p>Choose your payment method during checkout.</p>
+              <div class="payment-tags">
+                <div class="pay-tag">
+                  <div><b>PayPal</b><br><span>Extra 5% handling fee.</span></div>
+                  <div class="badge plus">+5%</div>
+                </div>
+                <div class="pay-tag">
+                  <div><b>Bank Transfer</b><br><span>No extra handling fee.</span></div>
+                  <div class="badge">No fee</div>
+                </div>
+                <div class="pay-tag">
+                  <div><b>Crypto Payment</b><br><span>No extra handling fee.</span></div>
+                  <div class="badge">No fee</div>
+                </div>
+              </div>
+            </article>
+
+            <article class="info-card">
+              <h3>Shipping & delivery</h3>
+              <p>We ship from Hong Kong to Europe with tracked delivery.</p>
+              <br>
+              <p>Estimated delivery time: <b>7–10 working days</b>.</p>
+              <br>
+              <p>Orders are usually shipped with <b>DHL</b> or <b>Royal Mail</b>, depending on the destination country and delivery route.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="container">
+          <h2>FAQ</h2>
+          <p class="section-sub">Common questions before customers enter checkout.</p>
+
+          <div class="faq-grid">
+            <article class="faq-item">
+              <h3>Can I wear it on my wrist?</h3>
+              <p>Yes, it can be worn as a casual daily watch accessory.</p>
+            </article>
+            <article class="faq-item">
+              <h3>Can I clip it to a bag?</h3>
+              <p>Yes, it can be attached to bags, backpacks or keys.</p>
+            </article>
+            <article class="faq-item">
+              <h3>Where do you ship from?</h3>
+              <p>We ship from Hong Kong.</p>
+            </article>
+            <article class="faq-item">
+              <h3>How long does delivery take?</h3>
+              <p>Delivery to Europe usually takes 7–10 working days.</p>
+            </article>
+            <article class="faq-item">
+              <h3>Which courier do you use?</h3>
+              <p>Orders are usually shipped with DHL or Royal Mail, depending on the destination country and delivery route.</p>
+            </article>
+            <article class="faq-item">
+              <h3>What payment methods do you support?</h3>
+              <p>PayPal, bank transfer and crypto payment. PayPal includes an extra 5% handling fee.</p>
+            </article>
+            <article class="faq-item">
+              <h3>What information is required for checkout?</h3>
+              <p>Email, full name, phone number, address line 1, city, state or region, postcode and country are required.</p>
+            </article>
+            <article class="faq-item">
+              <h3>What happens after I place an order?</h3>
+              <p>You receive an order number and continue on WhatsApp to confirm the order and payment.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      Preview page · Product images, live stock and final checkout connection can be replaced before production.
+    </footer>
+  </div>
+
+  <div class="fixed-order" id="fixedOrder">
+    <div class="fixed-copy">
+      <b>Colour Clip Watch</b>
+      <span>8 colours · Wear or clip</span>
+    </div>
+    <button onclick="scrollToProduct()">Order Now</button>
+  </div>
+
+  <div class="checkout-backdrop" id="checkoutBackdrop" role="dialog" aria-modal="true" aria-label="Checkout">
+    <div class="checkout">
+      <div class="checkout-head">
+        <h2>Checkout</h2>
+        <button class="close" onclick="closeCheckout()" aria-label="Close checkout">×</button>
+      </div>
+
+      <div class="steps">
+        <div class="step-pill active" id="pill1">1. Cart</div>
+        <div class="step-pill" id="pill2">2. Details</div>
+        <div class="step-pill" id="pill3">3. Payment</div>
+        <div class="step-pill" id="pill4">4. Confirm</div>
+      </div>
+
+      <div class="checkout-body">
+        <div class="checkout-layout">
+          <aside class="order-summary" aria-label="Order Summary">
+            <h3>Order Summary</h3>
+            <div class="summary-items" id="orderSummaryItems"></div>
+            <div class="summary-box">
+              <div class="summary-row"><span>Subtotal</span><b id="sideSubtotal">€49.00</b></div>
+              <div class="summary-row"><span>Payment fee</span><b id="sideFee">€2.45</b></div>
+              <div class="summary-row total"><span>Order total</span><b id="sideTotal">€51.45</b></div>
+            </div>
+            <div class="summary-meta">
+              <span>Ships from Hong Kong</span>
+              <span>DHL / Royal Mail</span>
+              <span>Europe 7–10 working days</span>
+            </div>
+          </aside>
+
+          <div class="checkout-main">
+            <section class="checkout-step active" id="step1">
+              <h3 class="cart-step-title">Cart / Review Items</h3>
+              <div class="cart-items" id="cartItems"></div>
+              <div class="summary-box">
+                <div class="summary-row total"><span>Cart subtotal</span><b id="cartSubtotal">€49.00</b></div>
+              </div>
+              <div class="checkout-actions">
+                <button class="btn secondary" onclick="closeCheckout()">Keep Browsing</button>
+                <button class="btn primary" onclick="goStep(2)">Continue to Details</button>
+              </div>
+            </section>
+
+            <section class="checkout-step" id="step2">
+              <div class="checkout-form">
+                <input id="email" type="email" placeholder="Email Address" autocomplete="email" />
+                <input id="fullName" type="text" placeholder="Full Name" autocomplete="name" />
+                <input id="phone" type="tel" placeholder="Phone Number" autocomplete="tel" />
+                <input id="address1" type="text" placeholder="Address Line 1" autocomplete="address-line1" />
+                <input id="city" type="text" placeholder="City" autocomplete="address-level2" />
+                <input id="state" type="text" placeholder="State / Province / Region" autocomplete="address-level1" />
+                <input id="postcode" type="text" placeholder="Postcode / ZIP Code" autocomplete="postal-code" />
+                <div class="country-select" id="countrySelect">
+                  <input id="countrySearch" type="text" placeholder="Country" autocomplete="off" aria-expanded="false" />
+                  <div class="country-options" id="countryOptions"></div>
+                </div>
+              </div>
+              <div class="checkout-actions">
+                <button class="btn secondary" onclick="goStep(1)">Back</button>
+                <button class="btn primary" onclick="validateDetails()">Continue to Payment</button>
+              </div>
+            </section>
+
+            <section class="checkout-step" id="step3">
+              <div class="checkout-payment">
+                <button type="button" class="payment-option active" data-method="PayPal" data-fee="0.05">
+                  <span><b>PayPal</b><span>Extra 5% handling fee.</span></span>
+                  <span class="badge plus">+5%</span>
+                </button>
+                <button type="button" class="payment-option" data-method="Bank Transfer" data-fee="0">
+                  <span><b>Bank Transfer</b><span>No extra handling fee.</span></span>
+                  <span class="badge">No fee</span>
+                </button>
+                <button type="button" class="payment-option" data-method="Crypto Payment" data-fee="0">
+                  <span><b>Crypto Payment</b><span>No extra handling fee.</span></span>
+                  <span class="badge">No fee</span>
+                </button>
+              </div>
+
+              <div class="summary-box">
+                <div class="summary-row"><span>Subtotal</span><b id="summarySubtotal">€49.00</b></div>
+                <div class="summary-row"><span>Payment fee</span><b id="summaryFee">€2.45</b></div>
+                <div class="summary-row total"><span>Order total</span><b id="summaryTotal">€51.45</b></div>
+              </div>
+
+              <div class="checkout-actions">
+                <button class="btn secondary" onclick="goStep(2)">Back</button>
+                <button class="btn primary" onclick="prepareConfirm()">Review Order</button>
+              </div>
+            </section>
+
+            <section class="checkout-step" id="step4">
+              <div class="confirm-grid">
+                <div class="confirm-card">
+                  <h3>Order</h3>
+                  <div class="confirm-items" id="confirmItems"></div>
+                  <p><b>Subtotal:</b> <span id="confirmSubtotal">€49.00</span></p>
+                  <p><b>Payment Method:</b> <span id="confirmPayment">PayPal</span></p>
+                  <p><b>Payment Fee:</b> <span id="confirmFee">€2.45</span></p>
+                  <p><b>Order Total:</b> <span id="confirmTotal">€51.45</span></p>
+                </div>
+                <div class="confirm-card">
+                  <h3>Shipping</h3>
+                  <p><b>Email:</b> <span id="confirmEmail"></span></p>
+                  <p><b>Full Name:</b> <span id="confirmName"></span></p>
+                  <p><b>Phone Number:</b> <span id="confirmPhone"></span></p>
+                  <p><b>Address Line 1:</b> <span id="confirmAddress1"></span></p>
+                  <p><b>City:</b> <span id="confirmCity"></span></p>
+                  <p><b>State / Province / Region:</b> <span id="confirmState"></span></p>
+                  <p><b>Postcode / ZIP Code:</b> <span id="confirmPostcode"></span></p>
+                  <p><b>Country:</b> <span id="confirmCountry"></span></p>
+                </div>
+              </div>
+
+              <div class="checkout-actions">
+                <button class="btn secondary" onclick="goStep(3)">Back</button>
+                <button class="btn primary" onclick="createOrder()">Create Order</button>
+              </div>
+            </section>
+
+            <section class="checkout-step" id="step5">
+              <div class="success">
+                <div class="ok">✓</div>
+                <h3>Order created successfully.</h3>
+                <p>Your order number is:</p>
+                <div class="order-no" id="orderNumber">LMW-00000000-0000</div>
+                <p>Please continue on WhatsApp to confirm your order.</p>
+                <a class="btn primary" id="whatsappLink" href="#" target="_blank" rel="noopener">Confirm on WhatsApp</a>
+              </div>
+            </section>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const BASE_PRICE = 49;
+    const WHATSAPP_NUMBER = "447000000000"; // Replace with real WhatsApp number in production: country code + phone number, no plus sign.
+
+    const colours = [
+      { name: "Blush Pink", value: "#f9a8d4" },
+      { name: "Clean White", value: "#ffffff" },
+      { name: "Sky Blue", value: "#a7d8ff" },
+      { name: "Sage Green", value: "#a7f3d0" },
+      { name: "Classic Black", value: "#111111" },
+      { name: "Soft Orange", value: "#ffae71" },
+      { name: "Warm Yellow", value: "#ffe66d" },
+      { name: "Soft Purple", value: "#cdb8ff" }
+    ];
+
+    const europeCountries = [
+      "United Kingdom",
+      "Ireland",
+      "France",
+      "Germany",
+      "Italy",
+      "Spain",
+      "Portugal",
+      "Netherlands",
+      "Belgium",
+      "Switzerland",
+      "Norway",
+      "Sweden",
+      "Denmark",
+      "Finland",
+      "Austria",
+      "Poland",
+      "Greece",
+      "Czech Republic",
+      "Romania",
+      "Hungary",
+      "Croatia",
+      "Slovakia",
+      "Slovenia",
+      "Estonia",
+      "Latvia",
+      "Lithuania",
+      "Luxembourg",
+      "Malta",
+      "Cyprus",
+      "Iceland",
+      "Turkey"
+    ];
+
+    let selectedColour = "Sky Blue";
+    let selectedColourValue = "#a7d8ff";
+    let quantity = 1;
+    let cart = [];
+    let selectedPaymentMethod = "PayPal";
+    let selectedFeeRate = 0.05;
+    let selectedCountry = "";
+    let currentStep = 1;
+
+    const productWatch = document.getElementById("productWatch");
+    const productLabel = document.getElementById("productLabel");
+    const fixedOrder = document.getElementById("fixedOrder");
+    const checkoutBackdrop = document.getElementById("checkoutBackdrop");
+    const checkoutPanel = document.querySelector(".checkout");
+    const countrySelect = document.getElementById("countrySelect");
+    const countrySearch = document.getElementById("countrySearch");
+    const countryOptions = document.getElementById("countryOptions");
+
+    function money(value){
+      return "€" + value.toFixed(2);
+    }
+
+    function subtotal(){
+      return cart.reduce((sum, item) => sum + item.quantity * BASE_PRICE, 0);
+    }
+
+    function paymentFee(){
+      return subtotal() * selectedFeeRate;
+    }
+
+    function total(){
+      return subtotal() + paymentFee();
+    }
+
+    function scrollToProduct(){
+      document.getElementById("product").scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function renderColourChoices(){
+      const wrap = document.getElementById("colourChoices");
+      wrap.innerHTML = "";
+
+      colours.forEach((colour) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "choice" + (colour.name === selectedColour ? " active" : "");
+        btn.dataset.colour = colour.name;
+        btn.innerHTML = '<span class="mini-dot" style="--c:' + colour.value + '"></span>' + colour.name;
+        btn.addEventListener("click", () => chooseColour(colour.name, colour.value));
+        wrap.appendChild(btn);
+      });
+    }
+
+    function chooseColour(name, value){
+      selectedColour = name;
+      selectedColourValue = value;
+      productWatch.style.setProperty("--product-c", value);
+      productLabel.textContent = "Selected colour: " + name;
+      document.querySelectorAll(".choice").forEach((el) => {
+        el.classList.toggle("active", el.dataset.colour === name);
+      });
+    }
+
+    function changeQty(delta){
+      quantity = Math.max(1, Math.min(20, quantity + delta));
+      document.getElementById("qtyValue").textContent = quantity;
+      document.getElementById("subtotalText").textContent = "Subtotal: " + money(BASE_PRICE * quantity);
+    }
+
+    function addSelectedToCart(){
+      const existing = cart.find((item) => item.colour === selectedColour);
+      if(existing){
+        existing.quantity = Math.min(20, existing.quantity + quantity);
+      }else{
+        cart.push({
+          colour: selectedColour,
+          colourValue: selectedColourValue,
+          quantity
+        });
+      }
+    }
+
+    function openCheckout(){
+      addSelectedToCart();
+      checkoutBackdrop.classList.add("active");
+      fixedOrder.classList.add("hidden");
+      document.body.style.overflow = "hidden";
+      renderCart();
+      updateSummary();
+      goStep(1);
+    }
+
+    function closeCheckout(){
+      checkoutBackdrop.classList.remove("active");
+      fixedOrder.classList.remove("hidden");
+      document.body.style.overflow = "";
+    }
+
+    function goStep(step){
+      currentStep = step;
+      checkoutPanel.classList.toggle("success-only", step === 5);
+      document.querySelectorAll(".checkout-step").forEach((el) => el.classList.remove("active"));
+      document.querySelectorAll(".step-pill").forEach((el) => el.classList.remove("active"));
+
+      document.getElementById("step" + step).classList.add("active");
+      if(step <= 4){
+        document.getElementById("pill" + step).classList.add("active");
+      }
+    }
+
+    function itemLine(item, compact){
+      const line = document.createElement("div");
+      line.className = compact ? "mini-cart-line" : "cart-line";
+
+      const thumb = document.createElement("div");
+      thumb.className = compact ? "" : "cart-thumb";
+      const watch = document.createElement("div");
+      watch.className = "tiny-watch";
+      watch.style.setProperty("--product-c", item.colourValue);
+      thumb.appendChild(watch);
+
+      const details = document.createElement("div");
+      const title = document.createElement(compact ? "b" : "h3");
+      title.textContent = "Colour Clip Watch";
+      const meta = document.createElement("p");
+      meta.textContent = item.colour + " × " + item.quantity + " · Unit price " + money(BASE_PRICE);
+      details.append(title, meta);
+
+      const price = document.createElement("div");
+      price.className = "cart-price";
+      price.textContent = money(item.quantity * BASE_PRICE);
+
+      line.append(thumb, details, price);
+      return line;
+    }
+
+    function renderCart(){
+      if(!cart.length){
+        cart.push({ colour: selectedColour, colourValue: selectedColourValue, quantity });
+      }
+
+      const cartItems = document.getElementById("cartItems");
+      const orderSummaryItems = document.getElementById("orderSummaryItems");
+      cartItems.innerHTML = "";
+      orderSummaryItems.innerHTML = "";
+
+      cart.forEach((item) => {
+        cartItems.appendChild(itemLine(item, false));
+        orderSummaryItems.appendChild(itemLine(item, true));
+      });
+
+      document.getElementById("cartSubtotal").textContent = money(subtotal());
+    }
+
+    function renderCountryOptions(query){
+      const q = query.trim().toLowerCase();
+      const matches = europeCountries.filter((country) => country.toLowerCase().includes(q));
+      countryOptions.innerHTML = "";
+
+      if(!matches.length){
+        const empty = document.createElement("div");
+        empty.className = "country-empty";
+        empty.textContent = "No countries found";
+        countryOptions.appendChild(empty);
+        return;
+      }
+
+      matches.forEach((country) => {
+        const option = document.createElement("button");
+        option.type = "button";
+        option.className = "country-option" + (country === selectedCountry ? " active" : "");
+        option.textContent = country;
+        option.addEventListener("click", () => {
+          selectedCountry = country;
+          countrySearch.value = country;
+          countrySelect.classList.remove("open");
+          countrySearch.setAttribute("aria-expanded", "false");
+        });
+        countryOptions.appendChild(option);
+      });
+    }
+
+    function validateDetails(){
+      const required = ["email","fullName","phone","address1","city","state","postcode"];
+      const missing = required.filter((id) => !document.getElementById(id).value.trim());
+      if(countrySearch.value.trim() !== selectedCountry){
+        selectedCountry = "";
+      }
+      if(missing.length || !selectedCountry){
+        alert("Please fill in all contact and shipping details.");
+        return;
+      }
+      goStep(3);
+    }
+
+    document.querySelectorAll(".payment-option").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".payment-option").forEach((el) => el.classList.remove("active"));
+        btn.classList.add("active");
+        selectedPaymentMethod = btn.dataset.method;
+        selectedFeeRate = Number(btn.dataset.fee);
+        updateSummary();
+      });
+    });
+
+    function updateSummary(){
+      const subtotalText = money(subtotal());
+      const feeText = money(paymentFee());
+      const totalText = money(total());
+      ["summarySubtotal","sideSubtotal"].forEach((id) => document.getElementById(id).textContent = subtotalText);
+      ["summaryFee","sideFee"].forEach((id) => document.getElementById(id).textContent = feeText);
+      ["summaryTotal","sideTotal"].forEach((id) => document.getElementById(id).textContent = totalText);
+    }
+
+    function prepareConfirm(){
+      const confirmItems = document.getElementById("confirmItems");
+      confirmItems.innerHTML = "";
+      cart.forEach((item) => {
+        const line = document.createElement("div");
+        line.className = "confirm-item-line";
+        const label = document.createElement("span");
+        label.textContent = item.colour + " × " + item.quantity;
+        const amount = document.createElement("b");
+        amount.textContent = money(item.quantity * BASE_PRICE);
+        line.append(label, amount);
+        confirmItems.appendChild(line);
+      });
+
+      document.getElementById("confirmSubtotal").textContent = money(subtotal());
+      document.getElementById("confirmPayment").textContent = selectedPaymentMethod;
+      document.getElementById("confirmFee").textContent = money(paymentFee());
+      document.getElementById("confirmTotal").textContent = money(total());
+
+      document.getElementById("confirmEmail").textContent = document.getElementById("email").value.trim();
+      document.getElementById("confirmName").textContent = document.getElementById("fullName").value.trim();
+      document.getElementById("confirmPhone").textContent = document.getElementById("phone").value.trim();
+      document.getElementById("confirmAddress1").textContent = document.getElementById("address1").value.trim();
+      document.getElementById("confirmCity").textContent = document.getElementById("city").value.trim();
+      document.getElementById("confirmState").textContent = document.getElementById("state").value.trim();
+      document.getElementById("confirmPostcode").textContent = document.getElementById("postcode").value.trim();
+      document.getElementById("confirmCountry").textContent = selectedCountry;
+
+      goStep(4);
+    }
+
+    function createOrder(){
+      const now = new Date();
+      const yyyy = now.getFullYear();
+      const mm = String(now.getMonth() + 1).padStart(2, "0");
+      const dd = String(now.getDate()).padStart(2, "0");
+      const random = Math.floor(1000 + Math.random() * 9000);
+      const orderNumber = "LMW-" + yyyy + mm + dd + "-" + random;
+
+      document.getElementById("orderNumber").textContent = orderNumber;
+      const message = "请确认一下我的订单：" + orderNumber;
+      const url = "https://wa.me/" + WHATSAPP_NUMBER + "?text=" + encodeURIComponent(message);
+      document.getElementById("whatsappLink").href = url;
+      goStep(5);
+    }
+
+    checkoutBackdrop.addEventListener("click", (event) => {
+      if(event.target === checkoutBackdrop){
+        closeCheckout();
+      }
+    });
+
+    countrySearch.addEventListener("focus", () => {
+      countrySelect.classList.add("open");
+      countrySearch.setAttribute("aria-expanded", "true");
+      renderCountryOptions(countrySearch.value);
+    });
+
+    countrySearch.addEventListener("input", () => {
+      if(countrySearch.value.trim() !== selectedCountry){
+        selectedCountry = "";
+      }
+      countrySelect.classList.add("open");
+      countrySearch.setAttribute("aria-expanded", "true");
+      renderCountryOptions(countrySearch.value);
+    });
+
+    document.addEventListener("click", (event) => {
+      if(!countrySelect.contains(event.target)){
+        countrySelect.classList.remove("open");
+        countrySearch.setAttribute("aria-expanded", "false");
+      }
+    });
+
+    renderColourChoices();
+    renderCountryOptions("");
+    updateSummary();
+  </script>
+</body>
+</html>
