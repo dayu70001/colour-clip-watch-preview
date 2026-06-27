@@ -35,12 +35,6 @@
       overflow-x:hidden;
       -webkit-text-size-adjust:100%;
     }
-    html.checkout-open,
-    html.checkout-open body{
-      overflow:hidden !important;
-      height:100% !important;
-      overscroll-behavior:none !important;
-    }
     html{scroll-behavior:smooth}
     body{
       position:relative;
@@ -736,6 +730,7 @@
       padding:24px;
       overflow-y:auto;
       overflow-x:hidden;
+      -webkit-overflow-scrolling:touch;
       overscroll-behavior:contain;
     }
     .checkout-backdrop.active{display:block}
@@ -1971,7 +1966,6 @@
     let selectedFeeRate = 0.05;
     let selectedCountry = "";
     let currentStep = 1;
-    let checkoutPageScrollY = 0;
 
     const productWatch = document.getElementById("productWatch");
     const productLabel = document.getElementById("productLabel");
@@ -1986,9 +1980,6 @@
     const countryOptions = document.getElementById("countryOptions");
     let addressSearchTimer;
     let addressRequestId = 0;
-    let checkoutTouchStart = { x: 0, y: 0 };
-    let checkoutTouchMoveHandler = null;
-    let checkoutTouchStartHandler = null;
 
     function money(value){
       return "€" + value.toFixed(2);
@@ -2234,12 +2225,9 @@
 
     function openCheckout(){
       addSelectedToCart();
-      checkoutPageScrollY = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
       checkoutBackdrop.classList.add("active");
       fixedOrder.classList.add("hidden");
-      document.documentElement.classList.add("checkout-open");
-      document.body.classList.add("checkout-open");
-      addCheckoutTouchLock();
+      checkoutBackdrop.scrollTop = 0;
       renderCart();
       updateSummary();
       goStep(1);
@@ -2247,13 +2235,10 @@
 
     function closeCheckout(event){
       if(event && typeof event.preventDefault === "function") event.preventDefault();
-      resetPageAfterCheckout({ restoreScroll: true });
+      resetPageAfterCheckout();
     }
 
-    function resetPageAfterCheckout(options = {}){
-      const restoreScroll = Boolean(options.restoreScroll);
-      const restoreY = restoreScroll ? checkoutPageScrollY : (window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0);
-
+    function resetPageAfterCheckout(){
       if(checkoutBackdrop){
         checkoutBackdrop.classList.remove("active");
         checkoutBackdrop.scrollTop = 0;
@@ -2269,86 +2254,13 @@
       document.body.classList.remove("checkout-open", "modal-open");
       document.documentElement.classList.remove("checkout-open", "modal-open");
 
-      const props = ["overflow","overflowX","overflowY","position","width","minWidth","maxWidth","height","minHeight","maxHeight","top","left","right","bottom","transform","touchAction","overscrollBehavior","paddingRight"];
-      props.forEach((prop) => {
+      ["overflow","overflowX","overflowY","position","top","left","right","bottom","width","height","maxHeight","transform","touchAction","overscrollBehavior","paddingRight"].forEach((prop) => {
         document.body.style.removeProperty(prop);
         document.documentElement.style.removeProperty(prop);
       });
 
-      removeCheckoutTouchLock();
-
       document.documentElement.scrollLeft = 0;
       document.body.scrollLeft = 0;
-
-      if(restoreScroll){
-        requestAnimationFrame(() => {
-          window.scrollTo(0, restoreY);
-          document.documentElement.scrollLeft = 0;
-          document.body.scrollLeft = 0;
-        });
-      }
-    }
-
-    function canScrollElement(element, deltaY, deltaX){
-      if(!element) return false;
-      const style = window.getComputedStyle(element);
-      if(deltaY !== 0 && element.scrollHeight > element.clientHeight && /(auto|scroll)/.test(style.overflowY)){
-        if(deltaY < 0 && element.scrollTop > 0) return true;
-        if(deltaY > 0 && element.scrollTop + element.clientHeight < element.scrollHeight - 1) return true;
-      }
-      if(deltaX !== 0 && element.scrollWidth > element.clientWidth && /(auto|scroll)/.test(style.overflowX)){
-        if(deltaX < 0 && element.scrollLeft > 0) return true;
-        if(deltaX > 0 && element.scrollLeft + element.clientWidth < element.scrollWidth - 1) return true;
-      }
-      return false;
-    }
-
-    function addCheckoutTouchLock(){
-      if(checkoutTouchMoveHandler) return;
-      checkoutTouchStartHandler = (event) => {
-        const touch = event.touches[0];
-        checkoutTouchStart.x = touch.clientX;
-        checkoutTouchStart.y = touch.clientY;
-      };
-      checkoutTouchMoveHandler = (event) => {
-        if(!checkoutBackdrop.classList.contains("active")) return;
-        const touch = event.touches[0];
-        const deltaX = touch.clientX - checkoutTouchStart.x;
-        const deltaY = touch.clientY - checkoutTouchStart.y;
-        const modal = event.target.closest(".checkout-backdrop, .checkout, .country-options, .address-suggestions");
-        if(!modal){
-          event.preventDefault();
-          return;
-        }
-        let node = event.target;
-        let scrollable = null;
-        while(node && node !== document.body && node !== document.documentElement){
-          const nodeStyle = window.getComputedStyle(node);
-          if((node.scrollHeight > node.clientHeight && /(auto|scroll)/.test(nodeStyle.overflowY)) ||
-             (node.scrollWidth > node.clientWidth && /(auto|scroll)/.test(nodeStyle.overflowX))){
-            scrollable = node;
-            break;
-          }
-          node = node.parentElement;
-        }
-        if(!scrollable) scrollable = modal;
-        if(!canScrollElement(scrollable, deltaY, deltaX)) event.preventDefault();
-      };
-      document.addEventListener("touchstart", checkoutTouchStartHandler, { passive: true });
-      document.addEventListener("touchmove", checkoutTouchMoveHandler, { passive: false });
-    }
-
-    function removeCheckoutTouchLock(){
-      if(checkoutTouchMoveHandler){
-        document.removeEventListener("touchmove", checkoutTouchMoveHandler, { passive: false });
-        checkoutTouchMoveHandler = null;
-      }
-      if(checkoutTouchStartHandler){
-        document.removeEventListener("touchstart", checkoutTouchStartHandler, { passive: true });
-        checkoutTouchStartHandler = null;
-      }
-      checkoutTouchStart.x = 0;
-      checkoutTouchStart.y = 0;
     }
 
     function scrollCheckoutToTop(){
