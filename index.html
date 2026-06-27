@@ -238,7 +238,7 @@
     .v7{--watch:#ffe66d;left:35%;bottom:7%}
     .v8{--watch:#cdb8ff;right:28%;bottom:28%}
 
-    .section{padding:50px 20px}
+    .section{padding:44px 20px}
     .section h2{
       margin:0 0 12px;
       font-size:clamp(31px,4.4vw,52px);
@@ -248,7 +248,7 @@
     }
     .section-sub{
       max-width:740px;
-      margin:0 0 26px;
+      margin:0 0 18px;
       color:#6b6267;
       font-size:17px;
     }
@@ -256,25 +256,27 @@
     .use-grid{
       display:grid;
       grid-template-columns:repeat(3,1fr);
-      gap:16px;
+      gap:14px;
+      max-width:930px;
+      margin:0 auto;
     }
     .use-card{
       background:rgba(255,255,255,.9);
       border:1px solid var(--line);
-      border-radius:30px;
-      padding:12px;
+      border-radius:26px;
+      padding:10px;
       box-shadow:0 14px 38px rgba(64,48,56,.07);
     }
     .use-image{
       width:100%;
       aspect-ratio:1 / 1;
-      border-radius:24px;
+      border-radius:20px;
       background:
         radial-gradient(circle at 50% 42%, rgba(255,255,255,.92) 0 13%, rgba(255,255,255,0) 14%),
         radial-gradient(circle at 50% 42%, var(--scene-c) 0 28%, rgba(255,255,255,0) 29%),
         linear-gradient(145deg,#fff,#fff0e7 48%,#eaf1ff);
       box-shadow:inset 0 0 0 1px rgba(255,255,255,.72);
-      margin:0 0 12px;
+      margin:0 0 10px;
     }
     .use-card h3{
       display:none;
@@ -284,9 +286,14 @@
       color:var(--muted);
       padding:0 2px 2px;
       line-height:1.45;
+      font-size:14px;
     }
 
-    .colors-section{background:linear-gradient(180deg,rgba(255,255,255,0),#fff7f1)}
+    .colors-section{
+      padding-top:40px;
+      padding-bottom:42px;
+      background:linear-gradient(180deg,rgba(255,255,255,0),#fff7f1)
+    }
     .color-grid{
       display:flex;
       gap:12px;
@@ -325,7 +332,7 @@
     }
 
     .product-section{
-      padding:56px 20px;
+      padding:44px 20px 52px;
       background:#fffaf5;
     }
     .product-card{
@@ -333,7 +340,7 @@
       margin:0 auto;
       display:grid;
       grid-template-columns:.95fr 1.05fr;
-      gap:26px;
+      gap:20px;
       align-items:stretch;
       background:#fff;
       border:1px solid var(--line);
@@ -405,7 +412,14 @@
       padding:8px 12px;border-radius:999px;
       background:#f0fdf4;color:#166534;
       font-size:13px;font-weight:950;
-      margin-bottom:14px;
+      margin-bottom:0;
+    }
+    .product-media .available{
+      position:absolute;
+      left:18px;
+      top:18px;
+      z-index:3;
+      box-shadow:0 12px 28px rgba(64,48,56,.08);
     }
     .pulse{width:8px;height:8px;border-radius:50%;background:var(--green)}
     .product-info h2{
@@ -1161,25 +1175,28 @@
       .v4{left:8%;bottom:19%}.v5{right:8%;bottom:18%}
       .v6{left:38%;top:8%}.v7{left:32%;bottom:6%}.v8{right:25%;bottom:30%}
 
-      .section{padding:38px 16px}
+      .section{padding:32px 16px}
       .section h2{font-size:33px}
-      .section-sub{font-size:15px;margin-bottom:20px}
+      .section-sub{font-size:15px;margin-bottom:14px}
       .use-card,.reason-card,.review-card,.info-card,.faq-item{
         border-radius:26px;
         padding:20px;
       }
-      .use-card{min-height:176px;padding:12px}
+      .use-grid{max-width:320px}
+      .use-card{min-height:0;padding:10px}
+      .use-image{border-radius:20px;margin-bottom:9px}
       .use-icon{width:60px;height:60px;border-radius:22px;font-size:27px}
-      .product-section{padding:38px 14px}
-      .product-card{border-radius:30px;padding:14px}
+      .colors-section{padding-top:28px;padding-bottom:30px}
+      .product-section{padding:28px 14px 34px}
+      .product-card{border-radius:30px;padding:14px;gap:14px}
       .product-media{border-radius:24px;min-height:310px}
       .product-watch{width:178px;height:178px}
       .product-watch::before{width:48px;height:54px;top:-34px}
       .product-watch::after{inset:50px}
       .product-watch .hand{height:42px}.product-watch .hand2{height:30px}
       .product-label{display:none}
-      .product-info{padding:8px 4px 10px}
-      .available{margin-bottom:10px}
+      .product-info{padding:4px 4px 10px}
+      .product-media .available{left:14px;top:14px;font-size:12px;padding:7px 10px}
       .product-title-row{
         display:flex;
         align-items:baseline;
@@ -1388,6 +1405,14 @@
       }
     }
 
+    @media (max-width:620px){
+      .use-grid{
+        max-width:320px;
+        margin-left:auto;
+        margin-right:auto;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -1425,8 +1450,8 @@
 
       <section class="section">
         <div class="container">
-          <h2>Wear it. Clip it. Carry it.</h2>
-          <p class="section-sub">A small accessory made for everyday use, from wrist styling to bag details and daily carry.</p>
+          <h2>Wear it. Clip it. Carry it your way.</h2>
+          <p class="section-sub">A compact clip watch for wrists, bags and everyday carry.</p>
 
           <div class="use-grid">
             <article class="use-card">
@@ -1468,6 +1493,7 @@
       <section class="product-section" id="product">
         <div class="product-card">
           <div class="product-media" data-image-key="product.mainImageUrl">
+            <div class="available"><span class="pulse"></span> Available to order</div>
             <div class="product-watch" id="productWatch" style="--product-c:#eadfd6">
               <span class="hand"></span>
               <span class="hand2"></span>
@@ -1476,7 +1502,6 @@
           </div>
 
           <div class="product-info">
-            <div class="available"><span class="pulse"></span> Available to order</div>
             <div class="product-title-row">
               <h2 data-edit-key="product.name">Colour Clip Watch</h2>
               <div class="price-row">
