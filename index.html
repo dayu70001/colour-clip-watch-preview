@@ -287,11 +287,21 @@
 
     .colors-section{background:linear-gradient(180deg,rgba(255,255,255,0),#fff7f1)}
     .color-grid{
-      display:grid;
-      grid-template-columns:repeat(8,1fr);
+      display:flex;
       gap:12px;
+      max-width:100%;
+      overflow-x:auto;
+      overflow-y:hidden;
+      overscroll-behavior-x:contain;
+      -webkit-overflow-scrolling:touch;
+      scrollbar-width:none;
+      padding-bottom:6px;
+    }
+    .color-grid::-webkit-scrollbar{
+      display:none;
     }
     .color-card{
+      flex:0 0 150px;
       background:#fff;
       border:1px solid var(--line);
       border-radius:24px;
@@ -1113,11 +1123,9 @@
       .visual{min-height:470px}
       .use-grid,.reasons,.review-grid{grid-template-columns:1fr}
       .color-grid{
-        grid-template-columns:repeat(4,minmax(0,1fr));
         gap:12px;
-        max-width:100%;
       }
-      .color-card{min-width:0}
+      .color-card{flex:0 0 min(42vw, 152px)}
       .product-media{min-height:370px}
       .faq-grid{grid-template-columns:1fr}
     }
@@ -1197,7 +1205,7 @@
       .checkout-layout{grid-template-columns:1fr}
       .order-summary{position:static;border-radius:24px}
       .payment-tags,.delivery-grid{grid-template-columns:1fr}
-      .color-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .color-card{flex-basis:min(44vw, 152px)}
       .cart-line{
         grid-template-columns:70px 1fr;
       }
