@@ -893,7 +893,7 @@
       grid-template-columns:1fr 1fr;
       gap:12px;
     }
-    input,textarea{
+    input,textarea,select{
       width:100%;
       border:1px solid #eadbd6;
       background:#fff;
@@ -901,7 +901,7 @@
       border-radius:18px;
       padding:14px;
       outline:none;
-      font-size:15px;
+      font-size:16px;
     }
     textarea{resize:vertical;min-height:92px}
     input:focus,textarea:focus{
@@ -1298,12 +1298,12 @@
       .product-actions .btn{width:100%}
 
       .fixed-order{
-        left:0;right:0;bottom:0;
-        width:100%;
+        left:12px;right:12px;bottom:0;
+        width:auto;
         min-height:72px;
         padding:11px 11px calc(10px + env(safe-area-inset-bottom)) 18px;
-        max-width:none;
-        border-radius:0;
+        max-width:calc(100vw - 24px);
+        border-radius:999px;
         transform:none;
         box-sizing:border-box;
       }
@@ -1312,11 +1312,16 @@
 
       .checkout-backdrop{padding:0}
       .checkout{
-        width:min(100% - 24px, 1080px);
-        max-width:calc(100vw - 24px);
-        min-height:calc(100dvh - 24px);
-        margin:12px auto;
-        border-radius:24px;
+        width:100%;
+        max-width:none;
+        min-height:100dvh;
+        margin:0;
+        border-radius:0;
+      }
+      .checkout input,
+      .checkout textarea,
+      .checkout select{
+        font-size:16px;
       }
       .checkout-head{padding:16px}
       .steps{
@@ -2042,7 +2047,7 @@
     function renderSiteContent(config){
       siteConfig = mergeConfig(config || {});
       BASE_PRICE = Number(siteConfig.product.price || 49);
-      WHATSAPP_NUMBER = siteConfig.whatsapp.number || WHATSAPP_NUMBER;
+      WHATSAPP_NUMBER = "85251200580";
       colours = siteConfig.colors.map((colour) => ({
         name: colour.name,
         value: colour.value,
@@ -2560,8 +2565,9 @@
       }
 
       document.getElementById("orderNumber").textContent = orderNumber;
-      const message = (siteConfig.whatsapp.message || "Please confirm my order. Order number: ") + orderNumber;
-      const url = "https://wa.me/" + WHATSAPP_NUMBER + "?text=" + encodeURIComponent(message);
+      const whatsappNumber = "85251200580";
+      const message = "Please confirm my order. Order number: " + orderNumber;
+      const url = "https://wa.me/" + whatsappNumber + "?text=" + encodeURIComponent(message);
       document.getElementById("whatsappLink").href = url;
       goStep(5);
     }
