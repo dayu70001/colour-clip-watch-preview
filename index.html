@@ -256,20 +256,21 @@
     .use-grid{
       display:grid;
       grid-template-columns:repeat(3,1fr);
-      gap:14px;
-      max-width:930px;
+      gap:16px;
+      max-width:1120px;
       margin:0 auto;
     }
     .use-card{
       background:rgba(255,255,255,.9);
       border:1px solid var(--line);
       border-radius:26px;
-      padding:10px;
+      padding:14px;
       box-shadow:0 14px 38px rgba(64,48,56,.07);
     }
     .use-image{
       width:100%;
-      aspect-ratio:4 / 3;
+      height:220px;
+      aspect-ratio:auto;
       border-radius:20px;
       background:
         radial-gradient(circle at 50% 42%, rgba(255,255,255,.92) 0 13%, rgba(255,255,255,0) 14%),
@@ -1182,9 +1183,9 @@
         border-radius:26px;
         padding:20px;
       }
-      .use-grid{max-width:320px}
-      .use-card{min-height:0;padding:10px}
-      .use-image{border-radius:20px;margin-bottom:9px}
+      .use-grid{width:100%;max-width:none}
+      .use-card{width:100%;min-height:0;padding:14px}
+      .use-image{height:clamp(180px,52vw,210px);border-radius:20px;margin-bottom:9px}
       .use-icon{width:60px;height:60px;border-radius:22px;font-size:27px}
       .colors-section{padding-top:28px;padding-bottom:30px}
       .product-section{padding:28px 14px 34px}
@@ -1407,7 +1408,8 @@
 
     @media (max-width:620px){
       .use-grid{
-        max-width:320px;
+        width:100%;
+        max-width:none;
         margin-left:auto;
         margin-right:auto;
       }
