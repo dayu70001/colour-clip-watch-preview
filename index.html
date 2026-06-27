@@ -282,7 +282,7 @@
     .color-dot{
       width:58px;height:58px;border-radius:50%;
       margin:0 auto 10px;
-      background:var(--c);
+      background:linear-gradient(135deg, var(--c) 0 50%, var(--accent, var(--c)) 50% 100%);
       border:1px solid rgba(48,43,62,.12);
       box-shadow:inset 0 0 0 8px rgba(255,255,255,.42);
     }
@@ -420,7 +420,7 @@
     }
     .mini-dot{
       width:22px;height:22px;border-radius:50%;
-      background:var(--c);
+      background:linear-gradient(135deg, var(--c) 0 50%, var(--accent, var(--c)) 50% 100%);
       border:1px solid rgba(48,43,62,.12);
       flex:0 0 auto;
     }
@@ -1249,14 +1249,14 @@
           <p class="section-sub">Pick the shade that fits your wrist, bag or everyday carry.</p>
 
           <div class="color-grid">
-            <div class="color-card"><div class="color-dot" style="--c:#f9a8d4"></div><b>Blush Pink</b></div>
-            <div class="color-card"><div class="color-dot" style="--c:#fff"></div><b>Clean White</b></div>
-            <div class="color-card"><div class="color-dot" style="--c:#a7d8ff"></div><b>Sky Blue</b></div>
-            <div class="color-card"><div class="color-dot" style="--c:#a7f3d0"></div><b>Sage Green</b></div>
-            <div class="color-card"><div class="color-dot" style="--c:#111"></div><b>Classic Black</b></div>
-            <div class="color-card"><div class="color-dot" style="--c:#ffae71"></div><b>Soft Orange</b></div>
-            <div class="color-card"><div class="color-dot" style="--c:#ffe66d"></div><b>Warm Yellow</b></div>
-            <div class="color-card"><div class="color-dot" style="--c:#cdb8ff"></div><b>Soft Purple</b></div>
+            <div class="color-card"><div class="color-dot" style="--c:#F3A6C8;--accent:#C82032"></div><b>OTTO ROSSO</b></div>
+            <div class="color-card"><div class="color-dot" style="--c:#F7F4EF;--accent:#6EA8FF"></div><b>HUIT BLANC</b></div>
+            <div class="color-card"><div class="color-dot" style="--c:#28A85A;--accent:#A8E35F"></div><b>GREEN EIGHT</b></div>
+            <div class="color-card"><div class="color-dot" style="--c:#B9E86A;--accent:#8FD3FF"></div><b>BLAUE ACHT</b></div>
+            <div class="color-card"><div class="color-dot" style="--c:#1F75D6;--accent:#8FD3FF"></div><b>LÀN BA</b></div>
+            <div class="color-card"><div class="color-dot" style="--c:#F4A0C8;--accent:#FFD447"></div><b>OTG ROZ</b></div>
+            <div class="color-card"><div class="color-dot" style="--c:#111111;--accent:#F4F4F4"></div><b>OCHO NEGRO</b></div>
+            <div class="color-card"><div class="color-dot" style="--c:#1D2E5F;--accent:#FF7A1A"></div><b>ORENJI HACHI</b></div>
           </div>
         </div>
       </section>
@@ -1264,11 +1264,11 @@
       <section class="product-section" id="product">
         <div class="product-card">
           <div class="product-media" data-image-key="product.mainImageUrl">
-            <div class="product-watch" id="productWatch" style="--product-c:#a7d8ff">
+            <div class="product-watch" id="productWatch" style="--product-c:#1F75D6">
               <span class="hand"></span>
               <span class="hand2"></span>
             </div>
-            <div class="product-label" id="productLabel">Selected colour: Sky Blue</div>
+            <div class="product-label" id="productLabel">Selected colour: LÀN BA</div>
           </div>
 
           <div class="product-info">
@@ -1589,14 +1589,14 @@
     let WHATSAPP_NUMBER = "447000000000"; // Real WhatsApp number format: country code + phone number, no plus sign.
 
     let colours = [
-      { name: "Blush Pink", value: "#f9a8d4" },
-      { name: "Clean White", value: "#ffffff" },
-      { name: "Sky Blue", value: "#a7d8ff" },
-      { name: "Sage Green", value: "#a7f3d0" },
-      { name: "Classic Black", value: "#111111" },
-      { name: "Soft Orange", value: "#ffae71" },
-      { name: "Warm Yellow", value: "#ffe66d" },
-      { name: "Soft Purple", value: "#cdb8ff" }
+      { name: "OTTO ROSSO", value: "#F3A6C8", accent: "#C82032" },
+      { name: "HUIT BLANC", value: "#F7F4EF", accent: "#6EA8FF" },
+      { name: "GREEN EIGHT", value: "#28A85A", accent: "#A8E35F" },
+      { name: "BLAUE ACHT", value: "#B9E86A", accent: "#8FD3FF" },
+      { name: "LÀN BA", value: "#1F75D6", accent: "#8FD3FF" },
+      { name: "OTG ROZ", value: "#F4A0C8", accent: "#FFD447" },
+      { name: "OCHO NEGRO", value: "#111111", accent: "#F4F4F4" },
+      { name: "ORENJI HACHI", value: "#1D2E5F", accent: "#FF7A1A" }
     ];
 
     const europeCountries = [
@@ -1653,7 +1653,7 @@
         name: "Colour Clip Watch",
         price: 49,
         description: "Choose your colour and quantity, then continue to checkout when you are ready.",
-        defaultColor: "Sky Blue",
+        defaultColor: "LÀN BA",
         mainImageUrl: "",
         colorImages: {}
       },
@@ -1699,8 +1699,8 @@
 
     let siteConfig = defaultSiteConfig;
 
-    let selectedColour = "Sky Blue";
-    let selectedColourValue = "#a7d8ff";
+    let selectedColour = "LÀN BA";
+    let selectedColourValue = "#1F75D6";
     let quantity = 1;
     let cart = [];
     let selectedPaymentMethod = "PayPal";
@@ -1779,6 +1779,7 @@
       colours = siteConfig.colors.map((colour) => ({
         name: colour.name,
         value: colour.value,
+        accent: colour.accent || "",
         imageUrl: colour.imageUrl || ""
       }));
       const defaultColour = colours.find((colour) => colour.name === siteConfig.product.defaultColor) || colours[2] || colours[0];
@@ -1805,7 +1806,7 @@
 
       const colorGrid = document.querySelector(".color-grid");
       colorGrid.innerHTML = siteConfig.colors.map((colour, index) => `
-        <div class="color-card"><div class="color-dot" style="--c:${colour.value}${colour.imageUrl ? `;background-image:url('${colour.imageUrl}');background-size:cover;background-position:center` : ""}" data-image-key="colors.${index}.imageUrl"></div><b data-edit-key="colors.${index}.name">${colour.name}</b></div>
+        <div class="color-card"><div class="color-dot" style="--c:${colour.value};--accent:${colour.accent || colour.value}${colour.imageUrl ? `;background-image:url('${colour.imageUrl}');background-size:cover;background-position:center` : ""}" data-image-key="colors.${index}.imageUrl"></div><b data-edit-key="colors.${index}.name">${colour.name}</b></div>
       `).join("");
 
       setText(".product-info h2", siteConfig.product.name);
@@ -1880,7 +1881,7 @@
         btn.type = "button";
         btn.className = "choice" + (colour.name === selectedColour ? " active" : "");
         btn.dataset.colour = colour.name;
-        btn.innerHTML = '<span class="mini-dot" style="--c:' + colour.value + '"></span>' + colour.name;
+        btn.innerHTML = '<span class="mini-dot" style="--c:' + colour.value + ';--accent:' + (colour.accent || colour.value) + '"></span>' + colour.name;
         btn.addEventListener("click", () => chooseColour(colour.name, colour.value));
         wrap.appendChild(btn);
       });
