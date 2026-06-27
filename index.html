@@ -1298,11 +1298,12 @@
       .product-actions .btn{width:100%}
 
       .fixed-order{
-        left:12px;right:12px;bottom:calc(24px + env(safe-area-inset-bottom));
-        width:auto;
+        left:0;right:0;bottom:0;
+        width:100%;
         min-height:72px;
-        padding:11px 11px 11px 18px;
-        max-width:calc(100vw - 24px);
+        padding:11px 11px calc(10px + env(safe-area-inset-bottom)) 18px;
+        max-width:none;
+        border-radius:0;
         transform:none;
         box-sizing:border-box;
       }
@@ -1359,17 +1360,6 @@
       .fixed-order button{padding:13px 18px}
     }
   
-    @supports (bottom: env(safe-area-inset-bottom)){
-      .fixed-order{
-        bottom:calc(16px + env(safe-area-inset-bottom));
-      }
-      @media(max-width:620px){
-        .fixed-order{
-          bottom:calc(24px + env(safe-area-inset-bottom));
-        }
-      }
-    }
-
     @media(max-width:620px){
       .checkout-head{
         position:sticky;
@@ -1841,7 +1831,7 @@
 
   <script>
     let BASE_PRICE = 49;
-    let WHATSAPP_NUMBER = "447000000000"; // Real WhatsApp number format: country code + phone number, no plus sign.
+    let WHATSAPP_NUMBER = "85251200580"; // Real WhatsApp number format: country code + phone number, no plus sign.
 
     let colours = [
       { name: "OTTO ROSSO", value: "#F3A6C8", accent: "#C82032" },
@@ -1951,8 +1941,8 @@
         whatsapp: "For order help, continue on WhatsApp after creating your order number."
       },
       whatsapp: {
-        number: "447000000000",
-        message: "请确认一下我的订单："
+        number: "85251200580",
+        message: "Please confirm my order. Order number: "
       }
     };
 
@@ -2570,7 +2560,7 @@
       }
 
       document.getElementById("orderNumber").textContent = orderNumber;
-      const message = (siteConfig.whatsapp.message || "请确认一下我的订单：") + orderNumber;
+      const message = (siteConfig.whatsapp.message || "Please confirm my order. Order number: ") + orderNumber;
       const url = "https://wa.me/" + WHATSAPP_NUMBER + "?text=" + encodeURIComponent(message);
       document.getElementById("whatsappLink").href = url;
       goStep(5);
