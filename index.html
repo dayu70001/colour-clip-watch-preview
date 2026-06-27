@@ -262,28 +262,29 @@
       background:rgba(255,255,255,.9);
       border:1px solid var(--line);
       border-radius:30px;
-      padding:14px;
+      padding:12px;
       box-shadow:0 14px 38px rgba(64,48,56,.07);
     }
     .use-image{
-      width:min(100%,240px);
+      width:100%;
       aspect-ratio:1 / 1;
-      max-height:260px;
       border-radius:24px;
       background:
         radial-gradient(circle at 50% 42%, rgba(255,255,255,.92) 0 13%, rgba(255,255,255,0) 14%),
         radial-gradient(circle at 50% 42%, var(--scene-c) 0 28%, rgba(255,255,255,0) 29%),
         linear-gradient(145deg,#fff,#fff0e7 48%,#eaf1ff);
       box-shadow:inset 0 0 0 1px rgba(255,255,255,.72);
-      margin:0 auto 18px;
+      margin:0 0 12px;
     }
     .use-card h3{
-      margin:0 0 8px;
-      color:var(--deep);
-      font-size:23px;
-      letter-spacing:-.03em;
+      display:none;
     }
-    .use-card p{margin:0;color:var(--muted)}
+    .use-card p{
+      margin:0;
+      color:var(--muted);
+      padding:0 2px 2px;
+      line-height:1.45;
+    }
 
     .colors-section{background:linear-gradient(180deg,rgba(255,255,255,0),#fff7f1)}
     .color-grid{
@@ -1167,7 +1168,7 @@
         border-radius:26px;
         padding:20px;
       }
-      .use-card{min-height:176px}
+      .use-card{min-height:176px;padding:12px}
       .use-icon{width:60px;height:60px;border-radius:22px;font-size:27px}
       .product-section{padding:38px 14px}
       .product-card{border-radius:30px;padding:14px}
@@ -1430,19 +1431,16 @@
           <div class="use-grid">
             <article class="use-card">
               <div class="use-image" style="--scene-c:#a7d8ff" data-image-key="ways.0.imageUrl"></div>
-              <h3 data-edit-key="ways.0.title">Wrist</h3>
               <p data-edit-key="ways.0.text">Wear it as a casual daily watch.</p>
             </article>
 
             <article class="use-card">
               <div class="use-image" style="--scene-c:#f9a8d4" data-image-key="ways.1.imageUrl"></div>
-              <h3 data-edit-key="ways.1.title">Bag</h3>
               <p data-edit-key="ways.1.text">Clip it to your bag or backpack.</p>
             </article>
 
             <article class="use-card">
               <div class="use-image" style="--scene-c:#a7f3d0" data-image-key="ways.2.imageUrl"></div>
-              <h3 data-edit-key="ways.2.title">Keys</h3>
               <p data-edit-key="ways.2.text">Carry it as a small everyday accessory.</p>
             </article>
           </div>
@@ -2015,7 +2013,6 @@
       document.querySelectorAll(".use-card").forEach((card, index) => {
         const way = siteConfig.ways[index];
         if(!way) return;
-        card.querySelector("h3").textContent = way.title;
         card.querySelector("p").textContent = way.text;
         setImageBackground(card.querySelector(".use-image"), way.imageUrl);
       });
