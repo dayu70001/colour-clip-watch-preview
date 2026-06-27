@@ -396,6 +396,9 @@
     .product-info{
       padding:8px 4px 8px 4px;
     }
+    .product-title-row{
+      display:block;
+    }
     .available{
       display:inline-flex;align-items:center;gap:8px;
       padding:8px 12px;border-radius:999px;
@@ -427,6 +430,9 @@
       margin:22px 0 10px;
       font-weight:950;
       color:#453646;
+    }
+    .mobile-product-label{
+      display:none;
     }
     .choice-grid{
       display:grid;
@@ -1170,10 +1176,89 @@
       .product-watch::before{width:48px;height:54px;top:-34px}
       .product-watch::after{inset:50px}
       .product-watch .hand{height:42px}.product-watch .hand2{height:30px}
-      .product-label{left:12px;right:12px;bottom:12px;font-size:14px;border-radius:17px}
+      .product-label{display:none}
       .product-info{padding:8px 4px 10px}
-      .choice-grid{grid-template-columns:1fr 1fr}
-      .product-actions{display:grid;grid-template-columns:1fr}
+      .available{margin-bottom:10px}
+      .product-title-row{
+        display:flex;
+        align-items:baseline;
+        justify-content:space-between;
+        gap:12px;
+      }
+      .product-info h2{
+        min-width:0;
+        overflow:hidden;
+        text-overflow:ellipsis;
+        white-space:nowrap;
+        font-size:24px;
+        line-height:1.05;
+        letter-spacing:-.035em;
+      }
+      .price-row{
+        flex:0 0 auto;
+        margin-top:0;
+        display:block;
+      }
+      .price{font-size:22px;line-height:1}
+      .price-note{display:none}
+      .product-desc{
+        margin:10px 0 16px;
+        max-width:none;
+        font-size:0;
+      }
+      .product-desc::after{
+        content:"Small clip watch for wrist styling, bag details and daily carry.";
+        font-size:14px;
+        line-height:1.45;
+      }
+      .colour-select-row{
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:12px;
+        margin:16px 0 10px;
+      }
+      .colour-select-row .select-label{
+        margin:0;
+      }
+      .mobile-product-label{
+        display:block;
+        color:var(--muted);
+        font-size:13px;
+        font-weight:850;
+        text-align:right;
+      }
+      .choice-grid{
+        display:flex;
+        grid-template-columns:none;
+        gap:10px;
+        overflow-x:auto;
+        overflow-y:hidden;
+        overscroll-behavior-x:contain;
+        -webkit-overflow-scrolling:touch;
+        scrollbar-width:none;
+        padding:2px 0 6px;
+      }
+      .choice-grid::-webkit-scrollbar{display:none}
+      .choice{
+        flex:0 0 auto;
+        width:48px;
+        height:48px;
+        min-width:48px;
+        border-radius:999px;
+        padding:5px;
+        justify-content:center;
+        gap:0;
+        font-size:0;
+      }
+      .choice.active{
+        box-shadow:0 0 0 2px var(--blue) inset, 0 10px 24px rgba(120,153,200,.22);
+      }
+      .mini-dot{
+        width:34px;
+        height:34px;
+      }
+      .product-actions{display:grid;grid-template-columns:1fr 1fr}
       .product-actions .btn{width:100%}
 
       .fixed-order{
@@ -1228,7 +1313,7 @@
       .hero h1{font-size:37px}
       .section h2{font-size:28px}
       .checkout-head h2,.cart-step-title{font-size:21px}
-      .choice{font-size:12px;padding:10px 7px;gap:6px}
+      .choice{font-size:0;padding:5px;gap:0}
       .step-pill{font-size:12px;padding:8px 8px}
       .success h3{font-size:28px}
     }
@@ -1385,23 +1470,28 @@
       <section class="product-section" id="product">
         <div class="product-card">
           <div class="product-media" data-image-key="product.mainImageUrl">
-            <div class="product-watch" id="productWatch" style="--product-c:#1F75D6">
+            <div class="product-watch" id="productWatch" style="--product-c:#eadfd6">
               <span class="hand"></span>
               <span class="hand2"></span>
             </div>
-            <div class="product-label" id="productLabel">Selected colour: LÀN BA</div>
+            <div class="product-label" id="productLabel">No colour selected</div>
           </div>
 
           <div class="product-info">
             <div class="available"><span class="pulse"></span> Available to order</div>
-            <h2 data-edit-key="product.name">Colour Clip Watch</h2>
-            <div class="price-row">
-              <div class="price" data-edit-key="product.price">€49.00</div>
-              <div class="price-note">Colour and quantity selectable</div>
+            <div class="product-title-row">
+              <h2 data-edit-key="product.name">Colour Clip Watch</h2>
+              <div class="price-row">
+                <div class="price" data-edit-key="product.price">€49.00</div>
+                <div class="price-note">Colour and quantity selectable</div>
+              </div>
             </div>
             <p class="product-desc" data-edit-key="product.description">Choose your colour and quantity, then continue to checkout when you are ready.</p>
 
-            <label class="select-label">Choose colour</label>
+            <div class="colour-select-row">
+              <label class="select-label">Choose colour</label>
+              <span class="mobile-product-label" id="mobileProductLabel">No colour selected</span>
+            </div>
             <div class="choice-grid" id="colourChoices"></div>
 
             <label class="select-label">Quantity</label>
@@ -1822,8 +1912,8 @@
 
     let siteConfig = defaultSiteConfig;
 
-    let selectedColour = "LÀN BA";
-    let selectedColourValue = "#1F75D6";
+    let selectedColour = "";
+    let selectedColourValue = "";
     let quantity = 1;
     let cart = [];
     let selectedPaymentMethod = "PayPal";
@@ -1833,6 +1923,7 @@
 
     const productWatch = document.getElementById("productWatch");
     const productLabel = document.getElementById("productLabel");
+    const mobileProductLabel = document.getElementById("mobileProductLabel");
     const fixedOrder = document.getElementById("fixedOrder");
     const checkoutBackdrop = document.getElementById("checkoutBackdrop");
     const checkoutPanel = document.querySelector(".checkout");
@@ -1908,12 +1999,10 @@
         accent: colour.accent || "",
         imageUrl: colour.imageUrl || ""
       }));
-      const defaultColour = colours.find((colour) => colour.name === siteConfig.product.defaultColor) || colours[2] || colours[0];
-
-      selectedColour = defaultColour.name;
-      selectedColourValue = defaultColour.value;
-      productWatch.style.setProperty("--product-c", selectedColourValue);
-      productLabel.textContent = "Selected colour: " + selectedColour;
+      selectedColour = "";
+      selectedColourValue = "";
+      productWatch.style.setProperty("--product-c", "#eadfd6");
+      updateColourStatus();
 
       setText('[data-edit-key="header.brandText"]', siteConfig.header.brandText);
       setText(".eyebrow", siteConfig.hero.eyebrow);
@@ -2013,11 +2102,21 @@
       });
     }
 
+    function updateColourStatus(){
+      const label = selectedColour ? "Selected: " + selectedColour : "No colour selected";
+      productLabel.textContent = label;
+      if(mobileProductLabel) mobileProductLabel.textContent = label;
+    }
+
+    function defaultOrderColour(){
+      return colours.find((colour) => colour.name === siteConfig.product.defaultColor) || colours[2] || colours[0];
+    }
+
     function chooseColour(name, value){
       selectedColour = name;
       selectedColourValue = value;
       productWatch.style.setProperty("--product-c", value);
-      productLabel.textContent = "Selected colour: " + name;
+      updateColourStatus();
       document.querySelectorAll(".choice").forEach((el) => {
         el.classList.toggle("active", el.dataset.colour === name);
       });
@@ -2030,6 +2129,10 @@
     }
 
     function addSelectedToCart(){
+      if(!selectedColour){
+        const fallback = defaultOrderColour();
+        if(fallback) chooseColour(fallback.name, fallback.value);
+      }
       const existing = cart.find((item) => item.colour === selectedColour);
       if(existing){
         existing.quantity = Math.min(20, existing.quantity + quantity);
