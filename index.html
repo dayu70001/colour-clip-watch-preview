@@ -1262,7 +1262,7 @@
       .product-actions .btn{width:100%}
 
       .fixed-order{
-        left:12px;right:12px;bottom:calc(18px + env(safe-area-inset-bottom));
+        left:12px;right:12px;bottom:calc(24px + env(safe-area-inset-bottom));
         width:auto;
         min-height:72px;
         padding:11px 11px 11px 18px;
@@ -1329,7 +1329,7 @@
       }
       @media(max-width:620px){
         .fixed-order{
-          bottom:calc(18px + env(safe-area-inset-bottom));
+          bottom:calc(24px + env(safe-area-inset-bottom));
         }
       }
     }
@@ -1657,7 +1657,7 @@
     <div class="checkout">
       <div class="checkout-head">
         <h2>Checkout</h2>
-        <button class="close" onclick="closeCheckout()" aria-label="Close checkout">×</button>
+        <button class="close" type="button" onclick="closeCheckout(event)" aria-label="Close checkout">×</button>
       </div>
 
       <div class="steps">
@@ -1920,6 +1920,7 @@
     let selectedFeeRate = 0.05;
     let selectedCountry = "";
     let currentStep = 1;
+    let checkoutPageScrollY = 0;
 
     const productWatch = document.getElementById("productWatch");
     const productLabel = document.getElementById("productLabel");
@@ -2147,6 +2148,7 @@
 
     function openCheckout(){
       addSelectedToCart();
+      checkoutPageScrollY = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
       checkoutBackdrop.classList.add("active");
       fixedOrder.classList.add("hidden");
       document.body.classList.add("checkout-open");
@@ -2157,11 +2159,15 @@
       goStep(1);
     }
 
-    function closeCheckout(){
-      resetPageAfterCheckout();
+    function closeCheckout(event){
+      if(event && typeof event.preventDefault === "function") event.preventDefault();
+      resetPageAfterCheckout({ restoreScroll: true });
     }
 
-    function resetPageAfterCheckout(){
+    function resetPageAfterCheckout(options = {}){
+      const restoreScroll = Boolean(options.restoreScroll);
+      const restoreY = restoreScroll ? checkoutPageScrollY : (window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0);
+
       if(checkoutBackdrop){
         checkoutBackdrop.classList.remove("active");
         checkoutBackdrop.scrollTop = 0;
@@ -2177,20 +2183,35 @@
       document.body.classList.remove("checkout-open", "modal-open");
       document.documentElement.classList.remove("checkout-open", "modal-open");
 
-      document.body.style.overflow = "";
-      document.body.style.position = "";
-      document.body.style.width = "";
-      document.body.style.top = "";
-      document.body.style.left = "";
-      document.body.style.right = "";
+      ["overflow","position","width","top","left","right","height","maxHeight","transform","touchAction"].forEach((prop) => {
+        document.body.style.removeProperty(prop);
+      });
+      ["overflow","position","width","height","maxHeight","transform","touchAction"].forEach((prop) => {
+        document.documentElement.style.removeProperty(prop);
+      });
 
-      document.documentElement.style.overflow = "";
-      document.documentElement.style.position = "";
-      document.documentElement.style.width = "";
-
-      window.scrollTo(0, window.scrollY);
+      window.scrollTo(0, restoreY);
       document.documentElement.scrollLeft = 0;
       document.body.scrollLeft = 0;
+
+      const repeatCleanup = () => {
+        if(checkoutBackdrop){
+          checkoutBackdrop.classList.remove("active");
+          checkoutBackdrop.scrollTop = 0;
+        }
+        if(checkoutPanel){
+          checkoutPanel.classList.remove("success-only");
+          checkoutPanel.scrollTop = 0;
+        }
+        if(fixedOrder) fixedOrder.classList.remove("hidden");
+        document.body.classList.remove("checkout-open", "modal-open");
+        document.documentElement.classList.remove("checkout-open", "modal-open");
+        document.documentElement.scrollLeft = 0;
+        document.body.scrollLeft = 0;
+        if(restoreScroll) window.scrollTo(0, restoreY);
+      };
+      requestAnimationFrame(repeatCleanup);
+      setTimeout(repeatCleanup, 120);
     }
 
     function scrollCheckoutToTop(){
@@ -2489,7 +2510,7 @@
     });
 
     document.getElementById("whatsappLink").addEventListener("click", () => {
-      resetPageAfterCheckout();
+      resetPageAfterCheckout({ restoreScroll: true });
     });
 
     window.addEventListener("pageshow", resetPageAfterCheckout);
