@@ -279,14 +279,11 @@
       box-shadow:inset 0 0 0 1px rgba(255,255,255,.72);
       margin:0 0 10px;
     }
-    /* Scene images: show the whole subject, lightly inset and centred,
-       instead of heavily cropping with cover. */
+    /* Scene images: fill the frame (cropped) and centred. */
     .use-image.has-bg-image{
-      background-size:contain !important;
+      background-size:cover !important;
       background-repeat:no-repeat !important;
       background-position:center !important;
-      background-color:#f5eee6;
-      padding:8px;
     }
     .use-card h3{
       display:none;
@@ -417,16 +414,7 @@
     .product-watch .hand{height:54px}
     .product-watch .hand2{height:38px}
     .product-label{
-      position:absolute;
-      left:18px;right:18px;bottom:18px;
-      background:transparent;
-      border:0;
-      color:rgba(255,255,255,.85);
-      border-radius:0;
-      padding:0;
-      font-weight:800;
-      text-shadow:0 1px 8px rgba(0,0,0,.5);
-      backdrop-filter:none;
+      display:none;
     }
     .product-info{
       padding:8px 4px 8px 4px;
