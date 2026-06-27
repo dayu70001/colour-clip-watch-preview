@@ -1177,7 +1177,7 @@
       .product-actions .btn{width:100%}
 
       .fixed-order{
-        left:12px;right:12px;bottom:calc(14px + env(safe-area-inset-bottom));
+        left:12px;right:12px;bottom:calc(18px + env(safe-area-inset-bottom));
         width:auto;
         min-height:72px;
         padding:11px 11px 11px 18px;
@@ -1244,7 +1244,7 @@
       }
       @media(max-width:620px){
         .fixed-order{
-          bottom:calc(14px + env(safe-area-inset-bottom));
+          bottom:calc(18px + env(safe-area-inset-bottom));
         }
       }
     }
@@ -2055,12 +2055,22 @@
     }
 
     function closeCheckout(){
-      checkoutBackdrop.classList.remove("active");
-      fixedOrder.classList.remove("hidden");
       resetPageAfterCheckout();
     }
 
     function resetPageAfterCheckout(){
+      if(checkoutBackdrop){
+        checkoutBackdrop.classList.remove("active");
+        checkoutBackdrop.scrollTop = 0;
+      }
+      if(checkoutPanel){
+        checkoutPanel.classList.remove("success-only");
+        checkoutPanel.scrollTop = 0;
+      }
+      if(fixedOrder){
+        fixedOrder.classList.remove("hidden");
+      }
+
       document.body.classList.remove("checkout-open", "modal-open");
       document.documentElement.classList.remove("checkout-open", "modal-open");
 
@@ -2075,6 +2085,7 @@
       document.documentElement.style.position = "";
       document.documentElement.style.width = "";
 
+      window.scrollTo(0, window.scrollY);
       document.documentElement.scrollLeft = 0;
       document.body.scrollLeft = 0;
     }
@@ -2375,7 +2386,6 @@
     });
 
     document.getElementById("whatsappLink").addEventListener("click", () => {
-      closeCheckout();
       resetPageAfterCheckout();
     });
 
