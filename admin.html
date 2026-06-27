@@ -25,6 +25,8 @@
     .btn{border:0;border-radius:999px;padding:12px 18px;font-weight:900;background:var(--deep);color:#fff}
     .btn.secondary{background:#fff;color:var(--deep);border:1px solid var(--line)}
     .btn.small{padding:8px 14px;font-size:13px}
+    .btn.danger{background:#fff;color:#b42318;border:1px solid #f1c4bd}
+    .btn.danger:hover{background:#fff5f4}
     .status{margin-top:12px;color:var(--muted);font-weight:700}
 
     /* App shell */
@@ -124,8 +126,8 @@
         <div class="orders-layout">
           <div class="panel">
             <table>
-              <thead><tr><th>Order</th><th>Name</th><th>Total</th><th>Status</th></tr></thead>
-              <tbody id="ordersTable"><tr><td colspan="4" class="muted">No orders loaded yet.</td></tr></tbody>
+              <thead><tr><th>Order</th><th>Name</th><th>Total</th><th>Status</th><th></th></tr></thead>
+              <tbody id="ordersTable"><tr><td colspan="5" class="muted">No orders loaded yet.</td></tr></tbody>
             </table>
           </div>
           <div class="panel" id="orderDetail">
@@ -267,7 +269,7 @@
     function renderOrders() {
       const tbody = document.getElementById("ordersTable");
       if (!orders.length) {
-        tbody.innerHTML = `<tr><td colspan="4" class="muted">No orders yet.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="5" class="muted">No orders yet.</td></tr>`;
         return;
       }
       tbody.innerHTML = orders.map((order, index) => `
@@ -276,8 +278,32 @@
           <td>${escapeHtml(order.customer?.fullName || "")}</td>
           <td>${money(order.total)}</td>
           <td>${escapeHtml(order.status || "New")}</td>
+          <td><button class="btn small danger" onclick="event.stopPropagation();deleteOrder('${escapeHtml(order.orderNumber)}')">Delete</button></td>
         </tr>
       `).join("");
+    }
+
+    async function deleteOrder(orderNumber) {
+      if (!confirm(`Delete order ${orderNumber}? This cannot be undone.`)) return;
+      try {
+        const response = await fetch("/api/orders", {
+          method: "DELETE",
+          headers: authHeaders(),
+          body: JSON.stringify({ orderNumber })
+        });
+        if (response.status === 401) return handleUnauthorized();
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(data.error || "Delete failed");
+        // Clear the detail panel if it was showing the deleted order.
+        const detail = document.getElementById("orderDetail");
+        if (detail.querySelector(`#confirmation-card-export`)) {
+          detail.innerHTML = `<p class="muted">Select an order to view the confirmation card.</p>`;
+        }
+        await loadOrders();
+        document.getElementById("ordersStatus").textContent = `Order ${orderNumber} deleted.`;
+      } catch (error) {
+        document.getElementById("ordersStatus").textContent = error.message;
+      }
     }
 
     function productImageFor(item) {
@@ -307,6 +333,7 @@
           <select class="btn secondary small" style="padding:8px 12px" onchange="updateStatus('${escapeHtml(order.orderNumber)}', this.value)">
             ${ORDER_STATUSES.map((status) => `<option ${status === order.status ? "selected" : ""}>${status}</option>`).join("")}
           </select>
+          <button class="btn small danger" onclick="deleteOrder('${escapeHtml(order.orderNumber)}')">Delete Order</button>
           <span class="status" id="exportStatus"></span>
         </div>
 

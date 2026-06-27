@@ -65,6 +65,14 @@ export async function addToSet(key, value) {
   await redis(["SADD", key, value]);
 }
 
+export async function removeFromSet(key, value) {
+  await redis(["SREM", key, value]);
+}
+
+export async function deleteKey(key) {
+  await redis(["DEL", key]);
+}
+
 export async function setMembers(key) {
   return await redis(["SMEMBERS", key]) || [];
 }

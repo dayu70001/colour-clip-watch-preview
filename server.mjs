@@ -58,6 +58,15 @@ function runKvCommand(command) {
     }
     case "SMEMBERS":
       return [...(kvSets.get(args[0]) || new Set())];
+    case "SREM": {
+      const set = kvSets.get(args[0]);
+      const removed = set && set.delete(args[1]) ? 1 : 0;
+      return removed;
+    }
+    case "DEL": {
+      const existed = kvStrings.delete(args[0]) || kvSets.delete(args[0]);
+      return existed ? 1 : 0;
+    }
     default:
       return null;
   }

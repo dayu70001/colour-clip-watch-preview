@@ -1,5 +1,5 @@
 import { requireAdmin } from "./_lib/auth.js";
-import { addToSet, getJson, listJson, setJson, setMembers, storageError } from "./_lib/storage.js";
+import { addToSet, deleteKey, getJson, listJson, removeFromSet, setJson, setMembers, storageError } from "./_lib/storage.js";
 
 const ORDER_INDEX_KEY = "colour-clip-watch:orders:index";
 const ORDER_KEY_PREFIX = "colour-clip-watch:orders:";
@@ -59,6 +59,24 @@ export default async function handler(req, res) {
       const updatedOrder = { ...order, status, updatedAt: new Date().toISOString() };
       await setJson(orderKey(orderNumber), updatedOrder);
       return res.status(200).json({ ok: true, order: updatedOrder });
+    }
+
+    if (req.method === "DELETE") {
+      if (!requireAdmin(req, res)) return;
+      const orderNumber = String(req.body?.orderNumber || req.query?.orderNumber || "");
+
+      if (!orderNumber) {
+        return res.status(400).json({ error: "Missing order number" });
+      }
+
+      const order = await getJson(orderKey(orderNumber), null);
+      if (!order) {
+        return res.status(404).json({ error: "Order not found" });
+      }
+
+      await deleteKey(orderKey(orderNumber));
+      await removeFromSet(ORDER_INDEX_KEY, orderNumber);
+      return res.status(200).json({ ok: true, orderNumber });
     }
 
     return res.status(405).json({ error: "Method not allowed" });

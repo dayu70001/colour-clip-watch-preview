@@ -1646,9 +1646,9 @@
 
   <div class="fixed-order" id="fixedOrder">
     <div class="fixed-copy">
-      <b>Colour Clip Watch</b>
+      <b data-edit-key="fixedBar.title">Colour Clip Watch</b>
     </div>
-    <button class="fixed-cta" onclick="scrollToProduct()">Order Now</button>
+    <button class="fixed-cta" data-edit-key="fixedBar.button" onclick="scrollToProduct()">Order Now</button>
   </div>
 
   <div class="checkout-backdrop" id="checkoutBackdrop" role="dialog" aria-modal="true" aria-label="Checkout">
@@ -1848,6 +1848,10 @@
       header: {
         brandText: "COLOUR CLIP WATCH"
       },
+      fixedBar: {
+        title: "Colour Clip Watch",
+        button: "Order Now"
+      },
       hero: {
         eyebrow: "8 colours · Wear or clip · Daily accessory",
         title: "A little colour for every day.",
@@ -1974,6 +1978,7 @@
         ...defaultSiteConfig,
         ...config,
         header: { ...defaultSiteConfig.header, ...(config.header || {}) },
+        fixedBar: { ...defaultSiteConfig.fixedBar, ...(config.fixedBar || {}) },
         hero: { ...defaultSiteConfig.hero, ...(config.hero || {}) },
         product: { ...defaultSiteConfig.product, ...(config.product || {}) },
         payment: { ...defaultSiteConfig.payment, ...(config.payment || {}) },
@@ -2004,6 +2009,8 @@
       updateColourStatus();
 
       setText('[data-edit-key="header.brandText"]', siteConfig.header.brandText);
+      setText('[data-edit-key="fixedBar.title"]', siteConfig.fixedBar.title);
+      setText('[data-edit-key="fixedBar.button"]', siteConfig.fixedBar.button);
       setText(".eyebrow", siteConfig.hero.eyebrow);
       const heroTitle = document.querySelector(".hero h1");
       if(heroTitle && siteConfig.hero.title) heroTitle.textContent = siteConfig.hero.title;
@@ -2570,7 +2577,8 @@
         .ccw-edit-mode [data-edit-key]:hover::after{content:"Edit"}
         .ccw-edit-mode [data-image-key]:hover::after{content:"Replace Image"}
         .ccw-edit-mode [contenteditable="true"]{outline:2px solid #d86f8f !important;background:rgba(216,111,143,.08);cursor:text}
-        .ccw-edit-mode .fixed-order{display:none !important}
+        /* Keep the fixed order bar visible in the editor so its text is editable. */
+        .ccw-edit-mode .fixed-order{display:flex !important;opacity:1 !important;transform:none !important;pointer-events:auto !important}
       `;
       document.head.appendChild(style);
 
