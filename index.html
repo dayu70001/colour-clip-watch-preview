@@ -1187,7 +1187,7 @@
   <div class="page">
     <header class="nav">
       <div class="nav-inner">
-        <div class="brand"><span class="brand-mark"></span> COLOUR CLIP WATCH</div>
+        <div class="brand"><span class="brand-mark"></span> <span data-edit-key="header.brandText">COLOUR CLIP WATCH</span></div>
         <div class="nav-note">8 colours · Available to order</div>
       </div>
     </header>
@@ -1634,6 +1634,9 @@
     ];
 
     const defaultSiteConfig = {
+      header: {
+        brandText: "COLOUR CLIP WATCH"
+      },
       hero: {
         eyebrow: "8 colours · Wear or clip · Daily accessory",
         title: "A little colour for every day.",
@@ -1754,6 +1757,7 @@
       return {
         ...defaultSiteConfig,
         ...config,
+        header: { ...defaultSiteConfig.header, ...(config.header || {}) },
         hero: { ...defaultSiteConfig.hero, ...(config.hero || {}) },
         product: { ...defaultSiteConfig.product, ...(config.product || {}) },
         payment: { ...defaultSiteConfig.payment, ...(config.payment || {}) },
@@ -1784,6 +1788,7 @@
       productWatch.style.setProperty("--product-c", selectedColourValue);
       productLabel.textContent = "Selected colour: " + selectedColour;
 
+      setText('[data-edit-key="header.brandText"]', siteConfig.header.brandText);
       setText(".eyebrow", siteConfig.hero.eyebrow);
       const heroTitle = document.querySelector(".hero h1");
       if(heroTitle && siteConfig.hero.title) heroTitle.textContent = siteConfig.hero.title;
