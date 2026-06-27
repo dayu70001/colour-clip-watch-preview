@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
   <title>Colour Clip Watch</title>
   <style>
     :root{
@@ -25,20 +25,27 @@
     }
 
     *,*::before,*::after{box-sizing:border-box;min-width:0}
+
+    /* Hard viewport lock.
+       The document itself never scrolls or pans: html/body are pinned to the
+       viewport with overflow hidden, so the page cannot be dragged sideways
+       and there is no document-level scroll to make position:fixed jitter on
+       iOS. All vertical scrolling happens inside .page instead. This is what
+       keeps every phone (incl. iOS Safari) from drifting left/right or moving
+       the bottom bar while scrolling. */
     html,body{
+      margin:0;
+      padding:0;
       width:100%;
-      max-width:100%;
-      overflow-x:hidden;
-      overscroll-behavior-x:none;
+      height:100%;
+      overflow:hidden;
+      overscroll-behavior:none;
       -webkit-text-size-adjust:100%;
-    }
-    @supports (overflow:clip){
-      html,body{overflow-x:clip}
     }
     html{scroll-behavior:smooth}
     body{
-      position:relative;
-      margin:0;
+      position:fixed;
+      inset:0;
       font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
       color:var(--text);
       background:
@@ -54,7 +61,18 @@
     img,video,canvas,svg{max-width:100%;height:auto}
     img{display:block}
     h1,h2,h3,p,a,b,span,label,div{overflow-wrap:break-word}
-    .page{min-height:100vh;padding-bottom:calc(106px + env(safe-area-inset-bottom))}
+
+    /* The only vertical scroll container. */
+    .page{
+      height:100%;
+      width:100%;
+      max-width:100%;
+      overflow-y:auto;
+      overflow-x:hidden;
+      -webkit-overflow-scrolling:touch;
+      overscroll-behavior-y:contain;
+      padding-bottom:calc(106px + env(safe-area-inset-bottom));
+    }
     .container{max-width:1120px;margin:0 auto}
 
     .nav{
@@ -1101,16 +1119,11 @@
       .visual{min-height:470px}
       .use-grid,.reasons,.review-grid{grid-template-columns:1fr}
       .color-grid{
-        display:flex;
-        max-width:100%;
-        overflow-x:auto;
+        grid-template-columns:repeat(4,minmax(0,1fr));
         gap:12px;
-        padding:4px 2px 12px;
-        scroll-snap-type:x mandatory;
-        overscroll-behavior-x:contain;
-        -webkit-overflow-scrolling:touch;
+        max-width:100%;
       }
-      .color-card{min-width:124px;flex:0 0 auto;scroll-snap-align:start}
+      .color-card{min-width:0}
       .product-media{min-height:370px}
       .faq-grid{grid-template-columns:1fr}
     }
@@ -1186,6 +1199,7 @@
       .checkout-layout{grid-template-columns:1fr}
       .order-summary{position:static;border-radius:24px}
       .payment-tags,.delivery-grid{grid-template-columns:1fr}
+      .color-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
       .cart-line{
         grid-template-columns:70px 1fr;
       }
@@ -1847,7 +1861,14 @@
     }
 
     function scrollToProduct(){
-      document.getElementById("product").scrollIntoView({ behavior: "smooth", block: "start" });
+      const product = document.getElementById("product");
+      const page = document.querySelector(".page") || document.scrollingElement;
+      if(!product || !page) return;
+      const start = page.scrollTop;
+      const y = product.getBoundingClientRect().top - page.getBoundingClientRect().top + start;
+      page.scrollTo({ top: y, behavior: "smooth" });
+      // Fallback for engines that ignore smooth scrolling on overflow containers.
+      setTimeout(() => { if(Math.abs(page.scrollTop - start) < 2) page.scrollTop = y; }, 320);
     }
 
     function setText(selector, value){
