@@ -279,6 +279,15 @@
       box-shadow:inset 0 0 0 1px rgba(255,255,255,.72);
       margin:0 0 10px;
     }
+    /* Scene images: show the whole subject, lightly inset and centred,
+       instead of heavily cropping with cover. */
+    .use-image.has-bg-image{
+      background-size:contain !important;
+      background-repeat:no-repeat !important;
+      background-position:center !important;
+      background-color:#f5eee6;
+      padding:8px;
+    }
     .use-card h3{
       display:none;
     }
@@ -372,6 +381,15 @@
     .visual.has-bg-image .visual-label{display:none}
     .product-media.has-bg-image::before,
     .product-media.has-bg-image .product-watch{display:none}
+    /* A colour without its own image shows a blank placeholder (no fallback
+       to the main image) so it is clear an image still needs to be added. */
+    .product-media.placeholder{background:#f4ede5 !important}
+    .product-media.placeholder::before,
+    .product-media.placeholder .product-watch{display:none}
+    .product-media.placeholder::after{
+      content:"No image for this colour yet";
+      color:#b3a7ac;font-size:14px;font-weight:800;text-align:center;padding:0 24px;
+    }
     .product-watch{
       position:relative;
       width:230px;height:230px;border-radius:50%;
@@ -401,13 +419,14 @@
     .product-label{
       position:absolute;
       left:18px;right:18px;bottom:18px;
-      background:rgba(255,255,255,.82);
-      border:1px solid rgba(255,255,255,.9);
-      color:var(--deep);
-      border-radius:20px;
-      padding:14px 16px;
-      font-weight:950;
-      backdrop-filter:blur(14px);
+      background:transparent;
+      border:0;
+      color:rgba(255,255,255,.85);
+      border-radius:0;
+      padding:0;
+      font-weight:800;
+      text-shadow:0 1px 8px rgba(0,0,0,.5);
+      backdrop-filter:none;
     }
     .product-info{
       padding:8px 4px 8px 4px;
@@ -2009,6 +2028,7 @@
         element.style.backgroundPosition = "center";
         element.style.backgroundRepeat = "no-repeat";
         element.classList.add("has-bg-image");
+        element.classList.remove("placeholder");
       }else{
         // No image configured: restore the default decorative look.
         element.style.backgroundImage = "";
@@ -2079,7 +2099,9 @@
       setText(".price", money(BASE_PRICE));
       setText(".product-desc", siteConfig.product.description);
       document.getElementById("subtotalText").textContent = "Subtotal: " + money(BASE_PRICE * quantity);
-      setImageBackground(document.querySelector(".product-media"), siteConfig.product.mainImageUrl);
+      const productMedia = document.querySelector(".product-media");
+      productMedia.classList.remove("placeholder");
+      setImageBackground(productMedia, siteConfig.product.mainImageUrl);
 
       document.querySelectorAll(".reason-card").forEach((card, index) => {
         const benefit = siteConfig.benefits[index];
@@ -2167,11 +2189,17 @@
       selectedColour = name;
       selectedColourValue = value;
       productWatch.style.setProperty("--product-c", value);
-      // Switch the main product image to this colour's image when available,
-      // otherwise fall back to the product main image (or the default watch).
+      // Show only this colour's own image. If it has none, show a blank
+      // placeholder instead of falling back to the main image, so it is
+      // clear the colour still needs an image.
       const colour = colours.find((item) => item.name === name);
-      const image = (colour && colour.imageUrl) || siteConfig.product.mainImageUrl || "";
-      setImageBackground(document.querySelector(".product-media"), image);
+      const media = document.querySelector(".product-media");
+      if(colour && colour.imageUrl){
+        setImageBackground(media, colour.imageUrl);
+      }else{
+        setImageBackground(media, "");
+        media.classList.add("placeholder");
+      }
       updateColourStatus();
       document.querySelectorAll(".choice").forEach((el) => {
         el.classList.toggle("active", el.dataset.colour === name);
