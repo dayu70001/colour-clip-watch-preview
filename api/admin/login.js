@@ -1,4 +1,4 @@
-import { isAdminPassword } from "../_lib/auth.js";
+import { isAdminPassword, createAdminToken } from "../_lib/auth.js";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -13,5 +13,10 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: "Invalid admin password" });
   }
 
-  return res.status(200).json({ ok: true });
+  const token = createAdminToken();
+  if (!token) {
+    return res.status(500).json({ error: "Admin session secret is not configured." });
+  }
+
+  return res.status(200).json({ ok: true, token, expiresIn: 7 * 24 * 60 * 60 });
 }
