@@ -246,14 +246,16 @@
       box-shadow:0 14px 38px rgba(64,48,56,.07);
     }
     .use-image{
-      aspect-ratio:4 / 5;
+      width:min(100%,240px);
+      aspect-ratio:1 / 1;
+      max-height:260px;
       border-radius:24px;
       background:
         radial-gradient(circle at 50% 42%, rgba(255,255,255,.92) 0 13%, rgba(255,255,255,0) 14%),
         radial-gradient(circle at 50% 42%, var(--scene-c) 0 28%, rgba(255,255,255,0) 29%),
         linear-gradient(145deg,#fff,#fff0e7 48%,#eaf1ff);
       box-shadow:inset 0 0 0 1px rgba(255,255,255,.72);
-      margin-bottom:18px;
+      margin:0 auto 18px;
     }
     .use-card h3{
       margin:0 0 8px;
@@ -562,9 +564,6 @@
       font-size:13px;
     }
     .pay-tag{
-      display:flex;
-      justify-content:space-between;
-      gap:14px;
       border:1px solid #eadbd6;
       border-radius:18px;
       padding:14px;
@@ -1352,15 +1351,12 @@
               <div class="payment-tags">
                 <div class="pay-tag">
                   <div><b>PayPal</b><br><span>Fast checkout with a 5% handling fee.</span></div>
-                  <div class="badge plus">+5%</div>
                 </div>
                 <div class="pay-tag">
                   <div><b>Bank Transfer</b><br><span>No extra handling fee.</span></div>
-                  <div class="badge">No fee</div>
                 </div>
                 <div class="pay-tag">
                   <div><b>Crypto Payment</b><br><span>No extra handling fee.</span></div>
-                  <div class="badge">No fee</div>
                 </div>
               </div>
             </article>
@@ -1370,15 +1366,15 @@
               <div class="delivery-grid">
                 <div class="delivery-card">
                   <b>Ships from Hong Kong</b>
-                  <p>Your order is prepared and shipped with tracked delivery.</p>
+                  <p>Tracked delivery from Hong Kong.</p>
                 </div>
                 <div class="delivery-card">
                   <b>Estimated delivery</b>
-                  <p>Delivery to Europe usually takes 7–10 working days after dispatch.</p>
+                  <p>Europe delivery usually takes 7–10 working days.</p>
                 </div>
                 <div class="delivery-card">
                   <b>Delivery route</b>
-                  <p>Courier may be DHL or Royal Mail depending on destination country and delivery route.</p>
+                  <p>DHL or Royal Mail depending on destination.</p>
                 </div>
               </div>
             </article>
@@ -1394,27 +1390,27 @@
           <div class="faq-grid">
             <article class="faq-item">
               <h3>Can I wear it or clip it to a bag?</h3>
-              <p>Yes. You can wear it on your wrist, clip it to your bag or backpack, or carry it with your keys as a small everyday accessory.</p>
+              <p>Yes. Wear it on your wrist, clip it to a bag or backpack, or carry it with your keys.</p>
             </article>
             <article class="faq-item">
               <h3>How long does delivery take?</h3>
-              <p>We ship from Hong Kong with tracked delivery. Delivery to Europe usually takes 7–10 working days after dispatch, depending on destination and route.</p>
+              <p>We ship from Hong Kong. Europe delivery usually takes 7–10 working days.</p>
             </article>
             <article class="faq-item">
               <h3>What payment methods do you support?</h3>
-              <p>PayPal, bank transfer and crypto payment are available. PayPal includes a 5% handling fee. Bank transfer and crypto payment have no extra handling fee.</p>
+              <p>PayPal, bank transfer and crypto payment are available. PayPal has a 5% handling fee.</p>
             </article>
             <article class="faq-item">
               <h3>What happens after I place an order?</h3>
-              <p>Your order number is created first. Continue on WhatsApp with that order number so we can confirm your order.</p>
+              <p>You will get an order number, then continue on WhatsApp to confirm your order.</p>
             </article>
             <article class="faq-item">
               <h3>What if the item arrives damaged or wrong?</h3>
-              <p>Please send your order number, package photos and product photos on WhatsApp. If the issue is confirmed, we will help arrange a replacement or another suitable solution.</p>
+              <p>Send your order number and clear photos on WhatsApp. We will check and help resolve it.</p>
             </article>
             <article class="faq-item">
               <h3>How do you use my checkout details?</h3>
-              <p>Your email, phone number and shipping address are only used to confirm your order and arrange delivery. We do not sell your personal information.</p>
+              <p>Your details are only used to confirm your order and arrange delivery.</p>
             </article>
           </div>
         </div>
