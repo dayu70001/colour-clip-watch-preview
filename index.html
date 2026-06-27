@@ -24,9 +24,20 @@
       --radius:30px;
     }
 
-    *{box-sizing:border-box}
+    *,*::before,*::after{box-sizing:border-box;min-width:0}
+    html,body{
+      width:100%;
+      max-width:100%;
+      overflow-x:hidden;
+      overscroll-behavior-x:none;
+      -webkit-text-size-adjust:100%;
+    }
+    @supports (overflow:clip){
+      html,body{overflow-x:clip}
+    }
     html{scroll-behavior:smooth}
     body{
+      position:relative;
       margin:0;
       font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
       color:var(--text);
@@ -35,13 +46,13 @@
         radial-gradient(circle at 93% 2%, rgba(218,231,255,.82), rgba(218,231,255,0) 34%),
         linear-gradient(180deg,var(--bg),#fff 54%,#fffaf5);
       line-height:1.5;
-      overflow-x:hidden;
     }
 
     button,input,textarea{font:inherit}
     button{cursor:pointer}
     a{text-decoration:none;color:inherit}
-    img{max-width:100%;height:auto;display:block}
+    img,video,canvas,svg{max-width:100%;height:auto}
+    img{display:block}
     h1,h2,h3,p,a,b,span,label,div{overflow-wrap:break-word}
     .page{min-height:100vh;padding-bottom:calc(106px + env(safe-area-inset-bottom))}
     .container{max-width:1120px;margin:0 auto}
@@ -654,14 +665,18 @@
       inset:0;
       z-index:200;
       display:none;
+      max-width:100vw;
       background:rgba(31,27,40,.58);
       backdrop-filter:blur(10px);
       -webkit-backdrop-filter:blur(10px);
       padding:24px;
-      overflow:auto;
+      overflow-y:auto;
+      overflow-x:hidden;
+      overscroll-behavior:contain;
     }
     .checkout-backdrop.active{display:block}
     .checkout{
+      width:min(100% - 0px, 1080px);
       max-width:1080px;
       margin:28px auto;
       background:#fff;
@@ -1087,13 +1102,15 @@
       .use-grid,.reasons,.review-grid{grid-template-columns:1fr}
       .color-grid{
         display:flex;
+        max-width:100%;
         overflow-x:auto;
         gap:12px;
         padding:4px 2px 12px;
         scroll-snap-type:x mandatory;
+        overscroll-behavior-x:contain;
         -webkit-overflow-scrolling:touch;
       }
-      .color-card{min-width:124px;scroll-snap-align:start}
+      .color-card{min-width:124px;flex:0 0 auto;scroll-snap-align:start}
       .product-media{min-height:370px}
       .faq-grid{grid-template-columns:1fr}
     }
@@ -1236,6 +1253,37 @@
       }
       .visual{
         min-height:350px;
+      }
+    }
+
+    /* Mobile width lock: keep every main container inside the viewport so the
+       page can never be dragged sideways. Uses max-width (not overflow-x) on
+       inner checkout containers to avoid clipping the country / address
+       dropdowns. Body-level overflow-x:clip is the real horizontal lock. */
+    @media (max-width:768px){
+      .page,
+      .container,
+      .nav,
+      .nav-inner,
+      .section,
+      .hero,
+      .hero-grid,
+      .product-section,
+      .product-card,
+      .product-info,
+      .product-media,
+      .use-grid,
+      .reasons,
+      .review-grid,
+      .info-grid,
+      .faq-grid,
+      .footer,
+      .checkout-backdrop,
+      .checkout,
+      .checkout-body,
+      .checkout-layout,
+      .checkout-main{
+        max-width:100%;
       }
     }
 
