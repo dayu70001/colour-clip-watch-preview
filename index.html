@@ -847,6 +847,40 @@
       color:var(--muted);
       font-weight:850;
     }
+    .address-autocomplete{
+      position:relative;
+    }
+    .address-suggestions{
+      display:none;
+      position:absolute;
+      left:0;
+      right:0;
+      top:calc(100% + 8px);
+      z-index:100;
+      max-height:240px;
+      overflow-y:auto;
+      background:#fff;
+      border:1px solid #eadfd6;
+      border-radius:18px;
+      box-shadow:0 18px 42px rgba(64,48,56,.14);
+      padding:8px;
+    }
+    .address-suggestions.open{
+      display:block;
+    }
+    .address-suggestion{
+      width:100%;
+      border:0;
+      background:transparent;
+      text-align:left;
+      border-radius:14px;
+      padding:12px 14px;
+      color:#302b3e;
+      cursor:pointer;
+    }
+    .address-suggestion:hover{
+      background:#f7f1eb;
+    }
     .full{grid-column:1 / -1}
     .checkout-payment{
       display:grid;
@@ -1446,7 +1480,10 @@
                 <input id="email" type="email" placeholder="Email Address" autocomplete="email" />
                 <input id="fullName" type="text" placeholder="Full Name" autocomplete="name" />
                 <input id="phone" type="tel" placeholder="Phone Number" autocomplete="tel" />
-                <input id="address1" type="text" placeholder="Address Line 1" autocomplete="address-line1" />
+                <div class="address-autocomplete">
+                  <input id="address1" type="text" placeholder="Address Line 1" autocomplete="address-line1" />
+                  <div class="address-suggestions" id="addressSuggestions"></div>
+                </div>
                 <input id="city" type="text" placeholder="City" autocomplete="address-level2" />
                 <input id="state" type="text" placeholder="State / Province / Region" autocomplete="address-level1" />
                 <input id="postcode" type="text" placeholder="Postcode / ZIP Code" autocomplete="postal-code" />
@@ -1597,9 +1634,13 @@
     const fixedOrder = document.getElementById("fixedOrder");
     const checkoutBackdrop = document.getElementById("checkoutBackdrop");
     const checkoutPanel = document.querySelector(".checkout");
+    const addressInput = document.getElementById("address1");
+    const addressSuggestions = document.getElementById("addressSuggestions");
     const countrySelect = document.getElementById("countrySelect");
     const countrySearch = document.getElementById("countrySearch");
     const countryOptions = document.getElementById("countryOptions");
+    let addressSearchTimer;
+    let addressRequestId = 0;
 
     function money(value){
       return "€" + value.toFixed(2);
@@ -1765,6 +1806,80 @@
       });
     }
 
+    function hideAddressSuggestions(){
+      addressSuggestions.classList.remove("open");
+      addressSuggestions.innerHTML = "";
+    }
+
+    function contextName(context, key){
+      return context && context[key] && context[key].name ? context[key].name : "";
+    }
+
+    function fillFromAddressFeature(feature){
+      const properties = feature.properties || {};
+      const context = properties.context || {};
+      const country = contextName(context, "country");
+
+      if(!europeCountries.includes(country)){
+        alert("Please choose a European delivery address.");
+        hideAddressSuggestions();
+        return;
+      }
+
+      addressInput.value =
+        contextName(context, "address") ||
+        properties.name ||
+        properties.full_address ||
+        addressInput.value;
+      document.getElementById("city").value =
+        contextName(context, "place") ||
+        contextName(context, "locality") ||
+        contextName(context, "district");
+      document.getElementById("state").value =
+        contextName(context, "region") ||
+        contextName(context, "district");
+      document.getElementById("postcode").value = contextName(context, "postcode");
+      selectedCountry = country;
+      countrySearch.value = country;
+      countrySelect.classList.remove("open");
+      countrySearch.setAttribute("aria-expanded", "false");
+      hideAddressSuggestions();
+    }
+
+    function renderAddressSuggestions(features){
+      addressSuggestions.innerHTML = "";
+
+      features.forEach((feature) => {
+        const option = document.createElement("button");
+        option.type = "button";
+        option.className = "address-suggestion";
+        option.textContent =
+          feature.properties && (feature.properties.full_address || feature.properties.name) ||
+          feature.name ||
+          "";
+        option.addEventListener("click", () => fillFromAddressFeature(feature));
+        addressSuggestions.appendChild(option);
+      });
+
+      addressSuggestions.classList.toggle("open", features.length > 0);
+    }
+
+    function searchAddressSuggestions(query){
+      const requestId = ++addressRequestId;
+
+      fetch(`/api/mapbox-geocode?q=${encodeURIComponent(query)}`)
+        .then((response) => response.ok ? response.json() : Promise.reject(new Error("Address lookup failed")))
+        .then((data) => {
+          if(requestId !== addressRequestId) return;
+          renderAddressSuggestions(Array.isArray(data.features) ? data.features : []);
+        })
+        .catch(() => {
+          if(requestId === addressRequestId){
+            hideAddressSuggestions();
+          }
+        });
+    }
+
     function validateDetails(){
       const required = ["email","fullName","phone","address1","city","state","postcode"];
       const missing = required.filter((id) => !document.getElementById(id).value.trim());
@@ -1864,10 +1979,25 @@
       renderCountryOptions(countrySearch.value);
     });
 
+    addressInput.addEventListener("input", () => {
+      clearTimeout(addressSearchTimer);
+      const query = addressInput.value.trim();
+
+      if(!query || query.length < 3){
+        hideAddressSuggestions();
+        return;
+      }
+
+      addressSearchTimer = setTimeout(() => searchAddressSuggestions(query), 400);
+    });
+
     document.addEventListener("click", (event) => {
       if(!countrySelect.contains(event.target)){
         countrySelect.classList.remove("open");
         countrySearch.setAttribute("aria-expanded", "false");
+      }
+      if(!addressSuggestions.contains(event.target) && event.target !== addressInput){
+        hideAddressSuggestions();
       }
     });
 
