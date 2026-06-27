@@ -2006,6 +2006,8 @@
     const countryOptions = document.getElementById("countryOptions");
     let addressSearchTimer;
     let addressRequestId = 0;
+    const SUCCESS_ORDER_KEY = "colourClipLastSuccessOrder";
+    const SUCCESS_ORDER_AT_KEY = "colourClipLastSuccessAt";
 
     function money(value){
       return "€" + value.toFixed(2);
@@ -2021,6 +2023,56 @@
 
     function total(){
       return subtotal() + paymentFee();
+    }
+
+    function successWhatsappUrl(orderNumber){
+      const message = "Please confirm my order. Order number: " + orderNumber;
+      return "https://wa.me/85251200580?text=" + encodeURIComponent(message);
+    }
+
+    function showSuccessOrder(orderNumber){
+      document.getElementById("orderNumber").textContent = orderNumber;
+      document.getElementById("whatsappLink").href = successWhatsappUrl(orderNumber);
+      checkoutBackdrop.classList.add("active");
+      fixedOrder.classList.add("hidden");
+      checkoutBackdrop.scrollTop = 0;
+      goStep(5);
+    }
+
+    function saveSuccessOrder(orderNumber){
+      try {
+        sessionStorage.setItem(SUCCESS_ORDER_KEY, orderNumber);
+        sessionStorage.setItem(SUCCESS_ORDER_AT_KEY, String(Date.now()));
+      } catch (error) {}
+    }
+
+    function clearSuccessOrder(){
+      try {
+        sessionStorage.removeItem(SUCCESS_ORDER_KEY);
+        sessionStorage.removeItem(SUCCESS_ORDER_AT_KEY);
+      } catch (error) {}
+    }
+
+    function restoreSuccessAfterRefresh(){
+      const params = new URLSearchParams(location.search);
+      if(params.get("admin_edit") === "1") return;
+
+      let orderNumber = "";
+      let savedAt = 0;
+      try {
+        orderNumber = sessionStorage.getItem(SUCCESS_ORDER_KEY) || "";
+        savedAt = Number(sessionStorage.getItem(SUCCESS_ORDER_AT_KEY) || 0);
+      } catch (error) {
+        return;
+      }
+
+      if(!orderNumber) return;
+      if(savedAt && Date.now() - savedAt > 24 * 60 * 60 * 1000){
+        clearSuccessOrder();
+        return;
+      }
+
+      showSuccessOrder(orderNumber);
     }
 
     function scrollToProduct(){
@@ -2271,6 +2323,7 @@
 
     function closeCheckout(event){
       if(event && typeof event.preventDefault === "function") event.preventDefault();
+      clearSuccessOrder();
       resetPageAfterCheckout();
     }
 
@@ -2640,12 +2693,8 @@
         return;
       }
 
-      document.getElementById("orderNumber").textContent = orderNumber;
-      const whatsappNumber = "85251200580";
-      const message = "Please confirm my order. Order number: " + orderNumber;
-      const url = "https://wa.me/" + whatsappNumber + "?text=" + encodeURIComponent(message);
-      document.getElementById("whatsappLink").href = url;
-      goStep(5);
+      saveSuccessOrder(orderNumber);
+      showSuccessOrder(orderNumber);
     }
 
     checkoutBackdrop.addEventListener("click", (event) => {
@@ -2812,6 +2861,7 @@
       renderColourChoices();
       renderCountryOptions("");
       updateSummary();
+      restoreSuccessAfterRefresh();
       if(window.__ccwAdminEdit) window.__ccwAdminEdit.ready();
     });
   </script>
