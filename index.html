@@ -41,7 +41,9 @@
     button,input,textarea{font:inherit}
     button{cursor:pointer}
     a{text-decoration:none;color:inherit}
-    .page{min-height:100vh;padding-bottom:106px}
+    img{max-width:100%;height:auto;display:block}
+    h1,h2,h3,p,a,b,span,label,div{overflow-wrap:break-word}
+    .page{min-height:100vh;padding-bottom:calc(106px + env(safe-area-inset-bottom))}
     .container{max-width:1120px;margin:0 auto}
 
     .nav{
@@ -992,31 +994,78 @@
     .confirm-item-line:first-child{border-top:0;padding-top:0}
     .confirm-item-line b{color:var(--deep)}
     .success{
+      max-width:440px;
+      margin:0 auto;
       text-align:center;
-      padding:22px 8px 10px;
+      padding:30px 4px 14px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
     }
     .success .ok{
-      width:64px;height:64px;border-radius:50%;
+      width:72px;height:72px;border-radius:50%;
       background:#dcfce7;color:#166534;
       display:flex;align-items:center;justify-content:center;
-      margin:0 auto 16px;
-      font-size:30px;font-weight:950;
+      margin:0 auto 18px;
+      font-size:34px;font-weight:950;
+      box-shadow:0 10px 26px rgba(22,101,52,.18);
     }
     .success h3{
-      margin:0 0 8px;
+      margin:0 0 6px;
       color:var(--deep);
-      font-size:30px;
+      font-size:32px;
       letter-spacing:-.04em;
     }
     .success p{color:var(--muted)}
+    .success-sub{
+      margin:0 0 22px;
+      font-size:17px;
+    }
+    .order-no-wrap{
+      width:100%;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:6px;
+      padding:16px;
+      border-radius:22px;
+      background:#fffdf9;
+      border:1px solid var(--line);
+      margin-bottom:18px;
+    }
+    .order-no-label{
+      font-size:12px;
+      font-weight:900;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      color:var(--muted);
+    }
     .order-no{
       display:inline-block;
-      margin:8px 0 18px;
-      padding:10px 14px;
-      border-radius:999px;
+      max-width:100%;
+      padding:10px 16px;
+      border-radius:14px;
       background:#f4eee8;
       color:var(--deep);
+      font-size:19px;
       font-weight:950;
+      letter-spacing:.02em;
+      word-break:break-all;
+    }
+    .success-note{
+      margin:0 0 22px;
+      font-size:14px;
+      line-height:1.5;
+      max-width:360px;
+    }
+    .success-cta{
+      width:100%;
+      max-width:320px;
+      min-height:52px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:16px;
     }
     .checkout-actions{
       display:flex;
@@ -1050,7 +1099,7 @@
     }
 
     @media(max-width:620px){
-      .page{padding-bottom:108px}
+      .page{padding-bottom:calc(112px + env(safe-area-inset-bottom))}
       .nav-inner{padding:12px 16px}
       .nav-note{display:none}
       .brand{font-size:14px}
@@ -1136,6 +1185,15 @@
       .checkout-actions{display:grid;grid-template-columns:1fr}
       .checkout-actions .btn{width:100%;min-width:0}
       .checkout-actions .btn.primary{margin-left:0}
+    }
+
+    @media(max-width:400px){
+      .hero h1{font-size:37px}
+      .section h2{font-size:28px}
+      .checkout-head h2,.cart-step-title{font-size:21px}
+      .choice{font-size:12px;padding:10px 7px;gap:6px}
+      .step-pill{font-size:12px;padding:8px 8px}
+      .success h3{font-size:28px}
     }
 
     @media(max-width:380px){
@@ -1571,11 +1629,14 @@
             <section class="checkout-step" id="step5">
               <div class="success">
                 <div class="ok">✓</div>
-                <h3>Order created successfully.</h3>
-                <p>Your order number is:</p>
-                <div class="order-no" id="orderNumber">LMW-00000000-0000</div>
-                <p>Please continue on WhatsApp to confirm your order.</p>
-                <a class="btn primary" id="whatsappLink" href="#" target="_blank" rel="noopener">Confirm on WhatsApp</a>
+                <h3>Thank you!</h3>
+                <p class="success-sub">We've received your order.</p>
+                <div class="order-no-wrap">
+                  <span class="order-no-label">Order Number</span>
+                  <div class="order-no" id="orderNumber">LMW-00000000-0000</div>
+                </div>
+                <p class="success-note">Please continue on WhatsApp with your order number so we can confirm payment and delivery details.</p>
+                <a class="btn primary success-cta" id="whatsappLink" href="#" target="_blank" rel="noopener">Confirm on WhatsApp</a>
               </div>
             </section>
           </div>
@@ -1932,6 +1993,20 @@
       document.body.style.overflow = "";
     }
 
+    function scrollCheckoutToTop(){
+      // The checkout modal scrolls inside the backdrop, not the window
+      // (body scrolling is locked while checkout is open). Reset instantly
+      // first so the new step always starts at the top, then smooth-scroll
+      // as a nicety where supported.
+      const panel = checkoutBackdrop;
+      if(panel){
+        panel.scrollTop = 0;
+        try { panel.scrollTo({ top: 0, behavior: "smooth" }); } catch(error) {}
+      }
+      if(checkoutPanel) checkoutPanel.scrollTop = 0;
+      try { window.scrollTo({ top: 0, behavior: "smooth" }); } catch(error) { window.scrollTo(0, 0); }
+    }
+
     function goStep(step){
       currentStep = step;
       checkoutPanel.classList.toggle("success-only", step === 5);
@@ -1942,6 +2017,8 @@
       if(step <= 4){
         document.getElementById("pill" + step).classList.add("active");
       }
+
+      scrollCheckoutToTop();
     }
 
     function itemLine(item, compact){
