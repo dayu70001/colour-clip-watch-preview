@@ -307,7 +307,16 @@
     }
 
     function productImageFor(item) {
-      return item?.image || siteConfig?.product?.mainImageUrl || PLACEHOLDER_IMG;
+      if (item?.imageUrl) return item.imageUrl;
+      if (item?.image) return item.image;
+      if (siteConfig?.colors && item?.colourIndex != null && siteConfig.colors[item.colourIndex]?.imageUrl) {
+        return siteConfig.colors[item.colourIndex].imageUrl;
+      }
+      if (siteConfig?.colors) {
+        const matched = siteConfig.colors.find((c) => c.name === item?.colour);
+        if (matched?.imageUrl) return matched.imageUrl;
+      }
+      return siteConfig?.product?.mainImageUrl || PLACEHOLDER_IMG;
     }
 
     function showOrder(index) {

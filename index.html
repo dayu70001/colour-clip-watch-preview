@@ -35,6 +35,12 @@
       overflow-x:hidden;
       -webkit-text-size-adjust:100%;
     }
+    html.checkout-open,
+    html.checkout-open body{
+      overflow:hidden !important;
+      height:100% !important;
+      overscroll-behavior:none !important;
+    }
     html{scroll-behavior:smooth}
     body{
       position:relative;
@@ -854,6 +860,8 @@
       background:linear-gradient(145deg,#fff,#fff0e7);
       display:flex;align-items:center;justify-content:center;
     }
+    .cart-thumb.placeholder{background:#f4ede5}
+    .cart-thumb.has-bg-image{background-size:cover;background-position:center;background-repeat:no-repeat}
     .tiny-watch{
       width:54px;height:54px;border-radius:50%;
       background:var(--product-c);
@@ -1978,6 +1986,9 @@
     const countryOptions = document.getElementById("countryOptions");
     let addressSearchTimer;
     let addressRequestId = 0;
+    let checkoutTouchStart = { x: 0, y: 0 };
+    let checkoutTouchMoveHandler = null;
+    let checkoutTouchStartHandler = null;
 
     function money(value){
       return "€" + value.toFixed(2);
@@ -2205,6 +2216,8 @@
         const fallback = defaultOrderColour();
         if(fallback) chooseColour(fallback.name, fallback.value);
       }
+      const colourIndex = colours.findIndex((c) => c.name === selectedColour);
+      const colourObj = colours[colourIndex];
       const existing = cart.find((item) => item.colour === selectedColour);
       if(existing){
         existing.quantity = Math.min(20, existing.quantity + quantity);
@@ -2212,6 +2225,8 @@
         cart.push({
           colour: selectedColour,
           colourValue: selectedColourValue,
+          colourIndex: colourIndex >= 0 ? colourIndex : -1,
+          imageUrl: (colourObj && colourObj.imageUrl) ? colourObj.imageUrl : "",
           quantity
         });
       }
@@ -2222,9 +2237,9 @@
       checkoutPageScrollY = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
       checkoutBackdrop.classList.add("active");
       fixedOrder.classList.add("hidden");
-      document.body.classList.add("checkout-open");
       document.documentElement.classList.add("checkout-open");
-      document.body.style.overflow = "hidden";
+      document.body.classList.add("checkout-open");
+      addCheckoutTouchLock();
       renderCart();
       updateSummary();
       goStep(1);
@@ -2254,35 +2269,86 @@
       document.body.classList.remove("checkout-open", "modal-open");
       document.documentElement.classList.remove("checkout-open", "modal-open");
 
-      ["overflow","position","width","top","left","right","height","maxHeight","transform","touchAction"].forEach((prop) => {
+      const props = ["overflow","overflowX","overflowY","position","width","minWidth","maxWidth","height","minHeight","maxHeight","top","left","right","bottom","transform","touchAction","overscrollBehavior","paddingRight"];
+      props.forEach((prop) => {
         document.body.style.removeProperty(prop);
-      });
-      ["overflow","position","width","height","maxHeight","transform","touchAction"].forEach((prop) => {
         document.documentElement.style.removeProperty(prop);
       });
 
-      window.scrollTo(0, restoreY);
+      removeCheckoutTouchLock();
+
       document.documentElement.scrollLeft = 0;
       document.body.scrollLeft = 0;
 
-      const repeatCleanup = () => {
-        if(checkoutBackdrop){
-          checkoutBackdrop.classList.remove("active");
-          checkoutBackdrop.scrollTop = 0;
-        }
-        if(checkoutPanel){
-          checkoutPanel.classList.remove("success-only");
-          checkoutPanel.scrollTop = 0;
-        }
-        if(fixedOrder) fixedOrder.classList.remove("hidden");
-        document.body.classList.remove("checkout-open", "modal-open");
-        document.documentElement.classList.remove("checkout-open", "modal-open");
-        document.documentElement.scrollLeft = 0;
-        document.body.scrollLeft = 0;
-        if(restoreScroll) window.scrollTo(0, restoreY);
+      if(restoreScroll){
+        requestAnimationFrame(() => {
+          window.scrollTo(0, restoreY);
+          document.documentElement.scrollLeft = 0;
+          document.body.scrollLeft = 0;
+        });
+      }
+    }
+
+    function canScrollElement(element, deltaY, deltaX){
+      if(!element) return false;
+      const style = window.getComputedStyle(element);
+      if(deltaY !== 0 && element.scrollHeight > element.clientHeight && /(auto|scroll)/.test(style.overflowY)){
+        if(deltaY < 0 && element.scrollTop > 0) return true;
+        if(deltaY > 0 && element.scrollTop + element.clientHeight < element.scrollHeight - 1) return true;
+      }
+      if(deltaX !== 0 && element.scrollWidth > element.clientWidth && /(auto|scroll)/.test(style.overflowX)){
+        if(deltaX < 0 && element.scrollLeft > 0) return true;
+        if(deltaX > 0 && element.scrollLeft + element.clientWidth < element.scrollWidth - 1) return true;
+      }
+      return false;
+    }
+
+    function addCheckoutTouchLock(){
+      if(checkoutTouchMoveHandler) return;
+      checkoutTouchStartHandler = (event) => {
+        const touch = event.touches[0];
+        checkoutTouchStart.x = touch.clientX;
+        checkoutTouchStart.y = touch.clientY;
       };
-      requestAnimationFrame(repeatCleanup);
-      setTimeout(repeatCleanup, 120);
+      checkoutTouchMoveHandler = (event) => {
+        if(!checkoutBackdrop.classList.contains("active")) return;
+        const touch = event.touches[0];
+        const deltaX = touch.clientX - checkoutTouchStart.x;
+        const deltaY = touch.clientY - checkoutTouchStart.y;
+        const modal = event.target.closest(".checkout-backdrop, .checkout, .country-options, .address-suggestions");
+        if(!modal){
+          event.preventDefault();
+          return;
+        }
+        let node = event.target;
+        let scrollable = null;
+        while(node && node !== document.body && node !== document.documentElement){
+          const nodeStyle = window.getComputedStyle(node);
+          if((node.scrollHeight > node.clientHeight && /(auto|scroll)/.test(nodeStyle.overflowY)) ||
+             (node.scrollWidth > node.clientWidth && /(auto|scroll)/.test(nodeStyle.overflowX))){
+            scrollable = node;
+            break;
+          }
+          node = node.parentElement;
+        }
+        if(!scrollable) scrollable = modal;
+        if(!canScrollElement(scrollable, deltaY, deltaX)) event.preventDefault();
+      };
+      document.addEventListener("touchstart", checkoutTouchStartHandler, { passive: true });
+      document.addEventListener("touchmove", checkoutTouchMoveHandler, { passive: false });
+    }
+
+    function removeCheckoutTouchLock(){
+      if(checkoutTouchMoveHandler){
+        document.removeEventListener("touchmove", checkoutTouchMoveHandler, { passive: false });
+        checkoutTouchMoveHandler = null;
+      }
+      if(checkoutTouchStartHandler){
+        document.removeEventListener("touchstart", checkoutTouchStartHandler, { passive: true });
+        checkoutTouchStartHandler = null;
+      }
+      checkoutTouchStart.x = 0;
+      checkoutTouchStart.y = 0;
     }
 
     function scrollCheckoutToTop(){
@@ -2310,11 +2376,25 @@
       line.className = compact ? "mini-cart-line" : "cart-line";
 
       const thumb = document.createElement("div");
-      thumb.className = compact ? "" : "cart-thumb";
-      const watch = document.createElement("div");
-      watch.className = "tiny-watch";
-      watch.style.setProperty("--product-c", item.colourValue);
-      thumb.appendChild(watch);
+      if(compact){
+        thumb.style.width = "34px";
+        thumb.style.height = "34px";
+        thumb.style.borderRadius = "8px";
+        thumb.style.backgroundColor = "#f4ede5";
+        thumb.style.flex = "0 0 auto";
+      }else{
+        thumb.className = "cart-thumb";
+      }
+
+      if(item.imageUrl){
+        thumb.style.backgroundImage = `url("${item.imageUrl}")`;
+        thumb.style.backgroundSize = "cover";
+        thumb.style.backgroundPosition = "center";
+        thumb.style.backgroundRepeat = "no-repeat";
+        if(!compact) thumb.classList.add("has-bg-image");
+      }else{
+        if(!compact) thumb.classList.add("placeholder");
+      }
 
       const details = document.createElement("div");
       const title = document.createElement(compact ? "b" : "h3");
@@ -2333,7 +2413,15 @@
 
     function renderCart(){
       if(!cart.length){
-        cart.push({ colour: selectedColour, colourValue: selectedColourValue, quantity });
+        const colourIndex = colours.findIndex((c) => c.name === selectedColour);
+        const colourObj = colours[colourIndex];
+        cart.push({
+          colour: selectedColour,
+          colourValue: selectedColourValue,
+          colourIndex: colourIndex >= 0 ? colourIndex : -1,
+          imageUrl: (colourObj && colourObj.imageUrl) ? colourObj.imageUrl : "",
+          quantity
+        });
       }
 
       const cartItems = document.getElementById("cartItems");
@@ -2530,6 +2618,8 @@
         items: cart.map((item) => ({
           productName: siteConfig.product.name || "Colour Clip Watch",
           colour: item.colour,
+          colourIndex: item.colourIndex,
+          imageUrl: item.imageUrl || "",
           quantity: item.quantity,
           unitPrice: BASE_PRICE,
           lineTotal: item.quantity * BASE_PRICE
