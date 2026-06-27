@@ -2654,11 +2654,11 @@
       }
     });
 
-    document.getElementById("whatsappLink").addEventListener("click", () => {
-      resetPageAfterCheckout({ restoreScroll: true });
+    window.addEventListener("pageshow", () => {
+      if(!checkoutBackdrop.classList.contains("active")){
+        resetPageAfterCheckout();
+      }
     });
-
-    window.addEventListener("pageshow", resetPageAfterCheckout);
 
     countrySearch.addEventListener("focus", () => {
       countrySelect.classList.add("open");
