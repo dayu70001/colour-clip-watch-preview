@@ -2750,15 +2750,55 @@
       trackPaymentInfo();
     }
 
-    async function createOrder(){
+    function inputValue(id){
+      return document.getElementById(id).value.trim();
+    }
+
+    function validateOrderBeforeSubmit(){
       if(!cart.length){
-        renderCart();
-        updateSummary();
-        goStep(1);
+        return { ok: false, step: 1, message: "Please add at least one item before placing your order." };
+      }
+
+      const missingDetails = ["email","fullName","phone","address1","city","postcode"].filter((id) => !inputValue(id));
+      if(countrySearch.value.trim() !== selectedCountry){
+        selectedCountry = "";
+      }
+      if(missingDetails.length || !selectedCountry){
+        return { ok: false, step: 2, message: "Please fill in all contact and shipping details." };
+      }
+
+      if(!selectedPaymentMethod){
+        return { ok: false, step: 3, message: "Please choose a payment method." };
+      }
+
+      if(subtotal() <= 0 || total() <= 0){
+        return { ok: false, step: 1, message: "Your order total is invalid. Please add the item again." };
+      }
+
+      return { ok: true };
+    }
+
+    function showOrderSubmitError(message, step){
+      const errorBox = document.getElementById("orderSaveError");
+      errorBox.textContent = message;
+      errorBox.classList.add("active");
+      if(step) goStep(step);
+      alert(message);
+    }
+
+    async function createOrder(){
+      const validation = validateOrderBeforeSubmit();
+      if(!validation.ok){
+        if(validation.step === 1){
+          renderCart();
+          updateSummary();
+        }
+        showOrderSubmitError(validation.message, validation.step);
         return;
       }
 
       const errorBox = document.getElementById("orderSaveError");
+      errorBox.textContent = "Order could not be saved. Please try again or contact us on WhatsApp.";
       errorBox.classList.remove("active");
       const now = new Date();
       const yyyy = now.getFullYear();

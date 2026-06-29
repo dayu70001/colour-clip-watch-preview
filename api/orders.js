@@ -13,13 +13,63 @@ function totalQuantity(items) {
   return (items || []).reduce((sum, item) => sum + Number(item.quantity || 0), 0);
 }
 
+function present(value) {
+  return typeof value === "string" ? value.trim().length > 0 : value != null && String(value).trim().length > 0;
+}
+
+function positiveNumber(value) {
+  const number = Number(value);
+  return Number.isFinite(number) && number > 0;
+}
+
+function validateOrder(order) {
+  const details = [];
+
+  if (!order || typeof order !== "object" || Array.isArray(order)) {
+    return ["order required"];
+  }
+
+  if (!present(order.orderNumber)) details.push("orderNumber required");
+
+  if (!Array.isArray(order.items) || !order.items.length) {
+    details.push("items required");
+  } else {
+    order.items.forEach((item, index) => {
+      const name = item?.name || item?.title || item?.productName;
+      const quantity = item?.qty ?? item?.quantity;
+      const price = item?.price ?? item?.unitPrice;
+
+      if (!present(name)) details.push(`items.${index}.name required`);
+      if (!positiveNumber(quantity)) details.push(`items.${index}.quantity invalid`);
+      if (!positiveNumber(price)) details.push(`items.${index}.price invalid`);
+    });
+  }
+
+  if (!present(order.customer?.fullName)) details.push("customer.fullName required");
+  if (!present(order.customer?.email)) details.push("customer.email required");
+  if (!present(order.customer?.phone)) details.push("customer.phone required");
+  if (!present(order.shipping?.address1)) details.push("shipping.address1 required");
+  if (!present(order.shipping?.city)) details.push("shipping.city required");
+  if (!present(order.shipping?.postcode)) details.push("shipping.postcode required");
+  if (!present(order.shipping?.country)) details.push("shipping.country required");
+  if (!present(order.paymentMethod)) details.push("paymentMethod required");
+  if (!positiveNumber(order.subtotal)) details.push("subtotal invalid");
+  if (!positiveNumber(order.total)) details.push("total invalid");
+  if (positiveNumber(order.subtotal) && positiveNumber(order.total) && Number(order.total) < Number(order.subtotal)) {
+    details.push("total must be greater than or equal to subtotal");
+  }
+
+  return details;
+}
+
 export default async function handler(req, res) {
   try {
     if (req.method === "POST") {
       const order = req.body?.order;
+      const details = validateOrder(order);
 
-      if (!order?.orderNumber) {
-        return res.status(400).json({ error: "Missing order number" });
+      if (details.length) {
+        return res.status(400).json({ error: "Invalid order", details });
       }
 
       const savedOrder = {
