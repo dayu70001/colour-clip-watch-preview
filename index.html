@@ -13,10 +13,10 @@
     t.src=v;s=b.getElementsByTagName(e)[0];
     s.parentNode.insertBefore(t,s)}(window, document,'script',
     'https://connect.facebook.net/en_US/fbevents.js');
-    fbq('init', '1235733945169519');
+    fbq('init', '1310493411250752');
     fbq('track', 'PageView');
   </script>
-  <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1235733945169519&ev=PageView&noscript=1" /></noscript>
+  <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1310493411250752&ev=PageView&noscript=1" /></noscript>
   <style>
     :root{
       --bg:#fff9f2;
@@ -1582,7 +1582,7 @@
             </div>
 
             <div class="product-actions">
-              <button class="btn secondary" onclick="addToCartSelected()">Add to Cart</button>
+              <button class="btn secondary" onclick="addToCartSelected()">Add Cart</button>
               <button class="btn primary" onclick="buyNowSelected()">Buy Now</button>
             </div>
 
@@ -1727,7 +1727,7 @@
     <div class="fixed-copy">
       <b data-edit-key="fixedBar.title">Colour Clip Watch</b>
     </div>
-    <button class="fixed-cta" data-edit-key="fixedBar.button" onclick="scrollToProduct()">Order Now</button>
+    <button class="fixed-cta" data-edit-key="fixedBar.button" onclick="scrollToProduct()">Shop Now</button>
   </div>
 
   <div class="checkout-backdrop" id="checkoutBackdrop" role="dialog" aria-modal="true" aria-label="Checkout">
@@ -1738,10 +1738,10 @@
       </div>
 
       <div class="steps">
-        <div class="step-pill active" id="pill1">1. Cart</div>
-        <div class="step-pill" id="pill2">2. Details</div>
-        <div class="step-pill" id="pill3">3. Payment</div>
-        <div class="step-pill" id="pill4">4. Confirm</div>
+        <div class="step-pill active" id="pill1">1. Shopping Cart</div>
+        <div class="step-pill" id="pill2">2. Shipping Address</div>
+        <div class="step-pill" id="pill3">3. Payment Method</div>
+        <div class="step-pill" id="pill4">4. Order Summary</div>
       </div>
 
       <div class="checkout-body">
@@ -1763,14 +1763,14 @@
 
           <div class="checkout-main">
             <section class="checkout-step active" id="step1">
-              <h3 class="cart-step-title">Cart / Review Items</h3>
+              <h3 class="cart-step-title">Shopping Cart</h3>
               <div class="cart-items" id="cartItems"></div>
               <div class="summary-box">
                 <div class="summary-row total"><span>Cart subtotal</span><b id="cartSubtotal">€49.00</b></div>
               </div>
               <div class="checkout-actions">
-                <button class="btn secondary" onclick="closeCheckout()">Keep Browsing</button>
-                <button class="btn primary" id="continueDetailsButton" onclick="if(cart.length){goStep(2)}">Continue to Details</button>
+                <button class="btn secondary" onclick="closeCheckout()">Continue Shopping</button>
+                <button class="btn primary" id="continueDetailsButton" onclick="startCheckoutFromCart()">Checkout</button>
               </div>
             </section>
 
@@ -1793,7 +1793,7 @@
               </div>
               <div class="checkout-actions">
                 <button class="btn secondary" onclick="goStep(1)">Back</button>
-                <button class="btn primary" onclick="validateDetails()">Continue to Payment</button>
+                <button class="btn primary" onclick="validateDetails()">Payment</button>
               </div>
             </section>
 
@@ -1821,7 +1821,7 @@
 
               <div class="checkout-actions">
                 <button class="btn secondary" onclick="goStep(2)">Back</button>
-                <button class="btn primary" onclick="prepareConfirm()">Review Order</button>
+                <button class="btn primary" onclick="prepareConfirm()">Order Summary</button>
               </div>
             </section>
 
@@ -1851,21 +1851,21 @@
               <div class="checkout-error" id="orderSaveError">Order could not be saved. Please try again or contact us on WhatsApp.</div>
               <div class="checkout-actions">
                 <button class="btn secondary" onclick="goStep(3)">Back</button>
-                <button class="btn primary" onclick="createOrder()">Create Order</button>
+                <button class="btn primary" onclick="createOrder()">Place Order</button>
               </div>
             </section>
 
             <section class="checkout-step" id="step5">
               <div class="success">
                 <div class="ok">✓</div>
-                <h3>Thank you!</h3>
+                <h3>Order Placed</h3>
                 <p class="success-sub">We've received your order.</p>
                 <div class="order-no-wrap">
                   <span class="order-no-label">Order Number</span>
                   <div class="order-no" id="orderNumber">LMW-00000000-0000</div>
                 </div>
                 <p class="success-note">Please continue on WhatsApp with your order number so we can confirm payment and delivery details.</p>
-                <a class="btn primary success-cta" id="whatsappLink" href="#" target="_blank" rel="noopener">Confirm on WhatsApp</a>
+                <a class="btn primary success-cta" id="whatsappLink" href="#" target="_blank" rel="noopener">Confirm Order on WhatsApp</a>
               </div>
             </section>
           </div>
@@ -1929,7 +1929,7 @@
       },
       fixedBar: {
         title: "Colour Clip Watch",
-        button: "Order Now"
+        button: "Shop Now"
       },
       hero: {
         eyebrow: "8 colours · Wear or clip · Daily accessory",
@@ -2019,7 +2019,11 @@
     const SUCCESS_ORDER_AT_KEY = "colourClipLastSuccessAt";
     const PIXEL_PRODUCT_NAME = "Colour Clip Watch";
     let viewContentTracked = false;
+    const selectedColourTrackedSet = new Set();
     const leadTrackedOrders = new Set();
+    let checkoutStartedTracked = false;
+    let shippingInfoSubmittedTracked = false;
+    let paymentInfoTracked = false;
 
     function money(value){
       return "€" + value.toFixed(2);
@@ -2074,6 +2078,49 @@
       trackPixel("Lead", productPixelParams(value));
     }
 
+    function resetCheckoutFunnelTracking(){
+      checkoutStartedTracked = false;
+      shippingInfoSubmittedTracked = false;
+      paymentInfoTracked = false;
+    }
+
+    function trackLandingCtaClick(){
+      trackPixelCustom("LandingCTAClick", {
+        ...productPixelParams(BASE_PRICE),
+        button_name: "Shop Now"
+      });
+    }
+
+    function trackColourCustomize(colourName){
+      if(selectedColourTrackedSet.has(colourName)) return;
+      selectedColourTrackedSet.add(colourName);
+      trackPixel("CustomizeProduct", {
+        ...productPixelParams(BASE_PRICE),
+        colour: colourName
+      });
+    }
+
+    function trackCheckoutStarted(){
+      if(checkoutStartedTracked || !cart.length) return;
+      checkoutStartedTracked = true;
+      trackPixel("InitiateCheckout", productPixelParams(getCartValue()));
+    }
+
+    function trackShippingInfoSubmitted(){
+      if(shippingInfoSubmittedTracked) return;
+      shippingInfoSubmittedTracked = true;
+      trackPixelCustom("ShippingInfoSubmitted", productPixelParams(getCartValue()));
+    }
+
+    function trackPaymentInfo(){
+      if(paymentInfoTracked) return;
+      paymentInfoTracked = true;
+      trackPixel("AddPaymentInfo", {
+        ...productPixelParams(getCartValue()),
+        payment_method: selectedPaymentMethod
+      });
+    }
+
     function successWhatsappUrl(orderNumber){
       const message = "Please confirm my order. Order number: " + orderNumber;
       return "https://wa.me/85251200580?text=" + encodeURIComponent(message);
@@ -2125,6 +2172,7 @@
     }
 
     function scrollToProduct(){
+      trackLandingCtaClick();
       const product = document.getElementById("product");
       if(!product) return;
       const y = product.getBoundingClientRect().top + window.scrollY - 12;
@@ -2193,7 +2241,7 @@
 
       setText('[data-edit-key="header.brandText"]', siteConfig.header.brandText);
       setText('[data-edit-key="fixedBar.title"]', siteConfig.fixedBar.title);
-      setText('[data-edit-key="fixedBar.button"]', siteConfig.fixedBar.button);
+      setText('[data-edit-key="fixedBar.button"]', "Shop Now");
       setText(".eyebrow", siteConfig.hero.eyebrow);
       const heroTitle = document.querySelector(".hero h1");
       if(heroTitle && siteConfig.hero.title) heroTitle.textContent = siteConfig.hero.title;
@@ -2287,7 +2335,7 @@
         btn.className = "choice" + (colour.name === selectedColour ? " active" : "");
         btn.dataset.colour = colour.name;
         btn.innerHTML = '<span class="mini-dot" style="--c:' + colour.value + ';--accent:' + (colour.accent || colour.value) + '"></span>' + colour.name;
-        btn.addEventListener("click", () => chooseColour(colour.name, colour.value));
+        btn.addEventListener("click", () => chooseColourFromUser(colour.name, colour.value));
         wrap.appendChild(btn);
       });
     }
@@ -2323,6 +2371,11 @@
       });
     }
 
+    function chooseColourFromUser(name, value){
+      chooseColour(name, value);
+      trackColourCustomize(name);
+    }
+
     function changeQty(delta){
       quantity = Math.max(1, Math.min(20, quantity + delta));
       document.getElementById("qtyValue").textContent = quantity;
@@ -2351,14 +2404,17 @@
     }
 
     function addToCartSelected(){
+      resetCheckoutFunnelTracking();
       addSelectedToCart();
       trackPixel("AddToCart", productPixelParams(BASE_PRICE));
       openCheckout();
     }
 
     function buyNowSelected(){
+      resetCheckoutFunnelTracking();
       cart = [];
       addSelectedToCart();
+      trackPixelCustom("BuyNowClick", productPixelParams(getCartValue() || BASE_PRICE));
       openCheckout();
     }
 
@@ -2368,14 +2424,24 @@
       checkoutBackdrop.scrollTop = 0;
       renderCart();
       updateSummary();
-      trackPixel("InitiateCheckout", productPixelParams(getCartValue()));
       goStep(1);
     }
 
     function closeCheckout(event){
       if(event && typeof event.preventDefault === "function") event.preventDefault();
       clearSuccessOrder();
+      resetCheckoutFunnelTracking();
       resetPageAfterCheckout();
+    }
+
+    function startCheckoutFromCart(){
+      if(!cart.length){
+        renderCart();
+        updateSummary();
+        return;
+      }
+      goStep(2);
+      trackCheckoutStarted();
     }
 
     function resetPageAfterCheckout(){
@@ -2622,6 +2688,7 @@
         return;
       }
       goStep(3);
+      trackShippingInfoSubmitted();
     }
 
     document.querySelectorAll(".payment-option").forEach((btn) => {
@@ -2680,6 +2747,7 @@
       document.getElementById("confirmCountry").textContent = selectedCountry;
 
       goStep(4);
+      trackPaymentInfo();
     }
 
     async function createOrder(){
