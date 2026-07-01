@@ -17,6 +17,18 @@
     fbq('track', 'PageView');
   </script>
   <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1310493411250752&ev=PageView&noscript=1" /></noscript>
+  <!-- TikTok Pixel Code Start -->
+  <script>
+  !function (w, d, t) {
+    w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"],ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(
+  var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e},ttq.load=function(e,n){var r="https://analytics.tiktok.com/i18n/pixel/events.js",o=n&&n.partner;ttq._i=ttq._i||{},ttq._i[e]=[],ttq._i[e]._u=r,ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n||{};n=document.createElement("script")
+  ;n.type="text/javascript",n.async=!0,n.src=r+"?sdkid="+e+"&lib="+t;e=document.getElementsByTagName("script")[0];e.parentNode.insertBefore(n,e)};
+
+    ttq.load('D92GBVRC77U79CKEM14G');
+    ttq.page();
+  }(window, document, 'ttq');
+  </script>
+  <!-- TikTok Pixel Code End -->
   <style>
     :root{
       --bg:#fff9f2;
@@ -2021,6 +2033,7 @@
     let viewContentTracked = false;
     const selectedColourTrackedSet = new Set();
     const leadTrackedOrders = new Set();
+    const tikTokOrderTrackedSet = new Set();
     let checkoutStartedTracked = false;
     let shippingInfoSubmittedTracked = false;
     let paymentInfoTracked = false;
@@ -2053,6 +2066,14 @@
       }
     }
 
+    function trackTikTok(eventName, params = {}){
+      try {
+        if(window.ttq && typeof window.ttq.track === "function"){
+          window.ttq.track(eventName, params);
+        }
+      } catch (error) {}
+    }
+
     function getCartValue(){
       return subtotal();
     }
@@ -2066,16 +2087,34 @@
       };
     }
 
+    function tikTokProductParams(value){
+      const amount = Number(value || BASE_PRICE);
+      return {
+        content_type: "product",
+        content_name: PIXEL_PRODUCT_NAME,
+        content_id: "colour-clip-watch",
+        value: amount,
+        currency: "EUR"
+      };
+    }
+
     function trackViewContentOnce(){
       if(viewContentTracked) return;
       viewContentTracked = true;
       trackPixel("ViewContent", productPixelParams(BASE_PRICE));
+      trackTikTok("ViewContent", tikTokProductParams(BASE_PRICE));
     }
 
     function trackLeadOnce(orderNumber, value){
       if(leadTrackedOrders.has(orderNumber)) return;
       leadTrackedOrders.add(orderNumber);
       trackPixel("Lead", productPixelParams(value));
+    }
+
+    function trackTikTokOrderOnce(orderNumber, value){
+      if(tikTokOrderTrackedSet.has(orderNumber)) return;
+      tikTokOrderTrackedSet.add(orderNumber);
+      trackTikTok("PlaceAnOrder", tikTokProductParams(value));
     }
 
     function resetCheckoutFunnelTracking(){
@@ -2089,6 +2128,10 @@
         ...productPixelParams(BASE_PRICE),
         button_name: "Shop Now"
       });
+      trackTikTok("ClickButton", {
+        ...tikTokProductParams(BASE_PRICE),
+        button_name: "Shop Now"
+      });
     }
 
     function trackColourCustomize(colourName){
@@ -2098,18 +2141,27 @@
         ...productPixelParams(BASE_PRICE),
         colour: colourName
       });
+      trackTikTok("CustomizeProduct", {
+        ...tikTokProductParams(BASE_PRICE),
+        colour: colourName
+      });
     }
 
     function trackCheckoutStarted(){
       if(checkoutStartedTracked || !cart.length) return;
       checkoutStartedTracked = true;
       trackPixel("InitiateCheckout", productPixelParams(getCartValue()));
+      trackTikTok("InitiateCheckout", tikTokProductParams(getCartValue()));
     }
 
     function trackShippingInfoSubmitted(){
       if(shippingInfoSubmittedTracked) return;
       shippingInfoSubmittedTracked = true;
       trackPixelCustom("ShippingInfoSubmitted", productPixelParams(getCartValue()));
+      trackTikTok("SubmitForm", {
+        ...tikTokProductParams(getCartValue()),
+        form_name: "Shipping Address"
+      });
     }
 
     function trackPaymentInfo(){
@@ -2117,6 +2169,10 @@
       paymentInfoTracked = true;
       trackPixel("AddPaymentInfo", {
         ...productPixelParams(getCartValue()),
+        payment_method: selectedPaymentMethod
+      });
+      trackTikTok("AddPaymentInfo", {
+        ...tikTokProductParams(getCartValue()),
         payment_method: selectedPaymentMethod
       });
     }
@@ -2407,6 +2463,7 @@
       resetCheckoutFunnelTracking();
       addSelectedToCart();
       trackPixel("AddToCart", productPixelParams(BASE_PRICE));
+      trackTikTok("AddToCart", tikTokProductParams(getCartValue() || BASE_PRICE));
       openCheckout();
     }
 
@@ -2415,6 +2472,10 @@
       cart = [];
       addSelectedToCart();
       trackPixelCustom("BuyNowClick", productPixelParams(getCartValue() || BASE_PRICE));
+      trackTikTok("ClickButton", {
+        ...tikTokProductParams(getCartValue() || BASE_PRICE),
+        button_name: "Buy Now"
+      });
       openCheckout();
     }
 
@@ -2854,6 +2915,7 @@
 
       saveSuccessOrder(orderNumber);
       trackLeadOnce(orderNumber, total());
+      trackTikTokOrderOnce(orderNumber, total());
       showSuccessOrder(orderNumber);
     }
 
@@ -2872,6 +2934,10 @@
     document.getElementById("whatsappLink").addEventListener("click", () => {
       trackPixelCustom("taplink:messengers:whatsapp", {
         content_name: PIXEL_PRODUCT_NAME
+      });
+      trackTikTok("ClickButton", {
+        ...tikTokProductParams(total() || getCartValue() || BASE_PRICE),
+        button_name: "Confirm Order on WhatsApp"
       });
     });
 
