@@ -2128,7 +2128,7 @@
         ...productPixelParams(BASE_PRICE),
         button_name: "Shop Now"
       });
-      trackTikTok("ClickButton", {
+      trackTikTok("LandingCTAClick", {
         ...tikTokProductParams(BASE_PRICE),
         button_name: "Shop Now"
       });
@@ -2472,7 +2472,7 @@
       cart = [];
       addSelectedToCart();
       trackPixelCustom("BuyNowClick", productPixelParams(getCartValue() || BASE_PRICE));
-      trackTikTok("ClickButton", {
+      trackTikTok("BuyNowClick", {
         ...tikTokProductParams(getCartValue() || BASE_PRICE),
         button_name: "Buy Now"
       });
@@ -2935,7 +2935,7 @@
       trackPixelCustom("taplink:messengers:whatsapp", {
         content_name: PIXEL_PRODUCT_NAME
       });
-      trackTikTok("ClickButton", {
+      trackTikTok("WhatsAppConfirmClick", {
         ...tikTokProductParams(total() || getCartValue() || BASE_PRICE),
         button_name: "Confirm Order on WhatsApp"
       });
